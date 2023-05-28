@@ -1,5 +1,6 @@
 import wx
 import os
+import re
 import ctypes
 
 # ctypes.windll.shcore.SetProcessDpiAwareness(1)
@@ -11,6 +12,9 @@ class MyFrame(wx.Frame):
             style=wx.DEFAULT_FRAME_STYLE & ~wx.RESIZE_BORDER)
         self.Center()
         self.SetBackgroundColour(wx.Colour(240, 240, 240))
+
+        # 创建集合用于接收拖入的文件列表
+        self.file_path_exist = set()
         
         # 修正窗口实际宽度
         win_width, win_height = self.GetClientSize()
@@ -28,17 +32,18 @@ class MyFrame(wx.Frame):
         self.list_ctrl.SetColumnWidth(2, 390)
         
         self.list_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self.list_selected)
-        self.list_ctrl.SetDropTarget(DropFolder(self.list_ctrl))
+        self.list_ctrl.SetDropTarget(DropFolder(self.list_ctrl, self.file_path_exist))
         
         # 标签容器
         self.edit_frame = wx.StaticBox(self, label="修改关联条目", size=(rule_width,0))
 
-        # 占位阿牛
+        # 占位
         self.lol = wx.Button(self, label="Clear List")
 
         # 进度条
         self.progress_bar = wx.Gauge(self, range=100)
-        self.progress_bar.SetMinSize((100, 32))
+        process_bar_width = rule_width - 345
+        self.progress_bar.SetMinSize((process_bar_width, 20))
 
         # 清除按钮
         self.clear_button = wx.Button(self, label="清除全部")
@@ -48,6 +53,7 @@ class MyFrame(wx.Frame):
         # 识别按钮
         self.analysis_button = wx.Button(self, label="开始识别")
         self.analysis_button.SetMinSize((100, 32))
+        self.analysis_button.Bind(wx.EVT_BUTTON, self.start_analysis)
 
         # 重命名按钮
         self.rename_button = wx.Button(self, label="重命名全部")
@@ -61,47 +67,67 @@ class MyFrame(wx.Frame):
         EDIT_FRAME.Add(self.lol, 0, wx.ALIGN_CENTER)
 
         CTRL_FRAME = wx.BoxSizer(wx.HORIZONTAL)
-        CTRL_FRAME.Add(self.progress_bar, 0, wx.LEFT, border=15)
+        CTRL_FRAME.Add(self.progress_bar, 0, wx.CENTER)
         CTRL_FRAME.Add(self.clear_button, 0, wx.LEFT, border=15)
         CTRL_FRAME.Add(self.analysis_button, 0, wx.LEFT, border=15)
         CTRL_FRAME.Add(self.rename_button, 0, wx.LEFT, border=15)
 
         WINDOW.Add(EDIT_FRAME, 0, wx.ALIGN_CENTER)
-        WINDOW.Add(CTRL_FRAME, 0, wx.TOP, border=15)
+        WINDOW.Add(CTRL_FRAME, 0, wx.TOP | wx.LEFT, border=15)
 
         self.SetSizer(WINDOW)
-        print("窗口创建完成，实际宽度" + str(rule_width))
-        # print(f"类中的文件夹列表：{file_path_list}")
-    
+        print("窗口创建完成，实际宽度" + str(rule_width) + "像素")
+
     def list_selected(self, event):
         selected_item = event.GetItem()
         file_name = self.list_ctrl.GetItemText(selected_item.GetId(), 0)
         print(f"当前选择文件夹: {file_name}")
-    
+
+    def start_analysis(self, event):
+        file_path_exist = self.list_ctrl.GetDropTarget().file_path_exist
+        for nnn in file_path_exist:
+            pattern = r"\] (.*?)\[|$"
+            match = re.search(pattern, str(nnn))
+            print(nnn)
+            if match:
+                nnn = match.group(1)
+                nnb = r"BD-BOX|BD-BOXXX"
+                print(nnb)
+                nnn = re.sub(nnb, "", nnn, flags=re.IGNORECASE)
+                print("格式化文件名：" + nnn)
+            else:
+                print("非标准的动画文件夹")
+
+        print(file_path_exist)
+
     def on_clear_list(self, event):
-        # print(DropFolder(MyFrame()).lol)
         self.list_ctrl.DeleteAllItems()
+        file_path_exist = set()
+        print("已清除所有文件夹")
 
 
 class DropFolder(wx.FileDropTarget):
-    def __init__(self, window):
+    def __init__(self, window, file_path_exist):
         super().__init__()
         self.window = window
-        self.file_path_exist = set()  # Track inserted folder names
-        
+        self.file_path_exist = file_path_exist
+
     def OnDropFiles(self, x, y, file_path_list):
-        print(f"类中的文件夹列表：{file_path_list}")
         for file_path in file_path_list:
+            # 判断是否为文件夹
             if os.path.isdir(file_path):
                 file_name = os.path.basename(file_path)
-                if file_path not in self.file_path_exist:  # Check for duplicates
+                # 判断是否存在相同文件夹，并写入 file_path_exist 列表
+                if file_path not in self.file_path_exist:
                     self.window.InsertItem(self.window.GetItemCount(), file_name)
-                    self.file_path_exist.add(file_path)  # Add inserted folder to set
-                    print(f"新增了文件路径：{file_path}")
-                    print(f"该文件夹为：{file_name}")
-                    print(f"当前文件夹列表为{self.file_path_exist}")
-
-                
+                    self.file_path_exist.add(file_path)
+                    print(f"新增了{file_name}")
+                    print(f"总路径列表：{self.file_path_exist}")
+                else:
+                    print(f"{file_name}已存在")
+            else:
+                print(f"已过滤文件{file_path}")
+ 
                 # 调整第一列宽度以适应内容
                 # width, height = self.window.GetTextExtent(file_name)
                 # width = width + 20
