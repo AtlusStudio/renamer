@@ -85,20 +85,24 @@ class MyFrame(wx.Frame):
 
     def start_analysis(self, event):
         file_path_exist = self.list_ctrl.GetDropTarget().file_path_exist
-        for nnn in file_path_exist:
-            pattern = r"\] (.*?)\[|$"
-            match = re.search(pattern, str(nnn))
-            print(nnn)
-            if match:
-                nnn = match.group(1)
-                nnb = r"BD-BOX|BD-BOXXX"
-                print(nnb)
-                nnn = re.sub(nnb, "", nnn, flags=re.IGNORECASE)
-                print("格式化文件名：" + nnn)
-            else:
-                print("非标准的动画文件夹")
+        if file_path_exist == set():
+            print("请先拖入文件夹")
+        else:
+            for file_path in file_path_exist:
+                file_name = os.path.basename(file_path)
+                
+                pattern = r"\] (.*?)\[|$"
+                match = re.search(pattern, str(file_name))
+                if match:
+                    romaji_name = match.group(1)
+                    excess = r"BD-BOX|BD-BOXXX"
+                    print(romaji_name)
+                    romaji_name = re.sub(excess, "", romaji_name, flags=re.IGNORECASE)
+                    print("格式化文件名：" + romaji_name)
+                else:
+                    print("非标准的动画文件夹")
 
-        print(file_path_exist)
+
 
     def on_clear_list(self, event):
         self.list_ctrl.DeleteAllItems()

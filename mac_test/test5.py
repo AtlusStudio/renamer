@@ -92,16 +92,7 @@ class DropFolder(wx.FileDropTarget):
         super().__init__()
         self.window = window
         self.file_path_exist = set()
-
-
-
-
-
-
-
-
-
-        
+   
     def OnDropFiles(self, x, y, file_path_list):
         for file_path in file_path_list:
             # 判断是否为文件夹
@@ -117,14 +108,5 @@ class DropFolder(wx.FileDropTarget):
                     print(f"{file_name}已存在")
             else:
                 print(f"已过滤文件{file_path}")
-
-
-
-
-                
-                # 调整第一列宽度以适应内容
-                # width, height = self.window.GetTextExtent(file_name)
-                # width = width + 20
-                # if width > 280:
-                #     self.window.SetColumnWidth(0, width)
         return True
+用中文说一下，上述代码，如何在start_analysis函数中获取被OnDropFiles函数修改后的file_path_exist变量值
