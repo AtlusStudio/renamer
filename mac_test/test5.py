@@ -1,30 +1,27 @@
 import wx
 
 class MyFrame(wx.Frame):
-    def __init__(self, parent):
-        wx.Frame.__init__(self, parent, title="固定尺寸的StaticBox示例")
-
-        panel = wx.Panel(self)
-
-        # 创建一个静态框
-        static_box = wx.StaticBox(panel, label="固定尺寸的框", size=(2000, 1500))
+    def __init__(self):
+        super().__init__(None, title="进度条示例")
         
-        # 创建一个静态框尺寸器，将静态框添加到其中
-        sizer = wx.StaticBoxSizer(static_box, wx.VERTICAL)
+        self.panel = wx.Panel(self)
         
-        # 在静态框尺寸器中添加其他控件
-        label = wx.StaticText(panel, label="这是一个静态框尺寸器示例")
-        sizer.Add(label, 0, wx.ALL, 10)
+        self.progress_bar = wx.Gauge(self.panel, range=100)
         
-        # 设置主面板的布局管理器为静态框尺寸器
-        panel.SetSizer(sizer)
-        
-        # 自适应布局
-        sizer.Fit(self)
+        self.timer = wx.Timer(self)
+        self.Bind(wx.EVT_TIMER, self.update_progress, self.timer)
+        self.timer.Start(100)  # 每100毫秒更新一次进度条
         
         self.Show()
 
+    def update_progress(self, event):
+        value = self.progress_bar.GetValue()
+        if value < 100:
+            value += 1
+            self.progress_bar.SetValue(value)
+        else:
+            self.timer.Stop()
 
 app = wx.App()
-frame = MyFrame(None)
+frame = MyFrame()
 app.MainLoop()

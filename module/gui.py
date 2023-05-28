@@ -2,21 +2,24 @@ import wx
 import os
 import ctypes
 
-ctypes.windll.shcore.SetProcessDpiAwareness(1)
-ScaleFactor=ctypes.windll.shcore.GetScaleFactorForDevice(0)
-
-
+# ctypes.windll.shcore.SetProcessDpiAwareness(1)
+# ScaleFactor=ctypes.windll.shcore.GetScaleFactorForDevice(0)
 
 class MyFrame(wx.Frame):
     def __init__(self):
-        super().__init__(None, title="renamer", size=(1000, 600))
+        super().__init__(None, title="renamer", size=(1000, 600), 
+            style=wx.DEFAULT_FRAME_STYLE & ~wx.RESIZE_BORDER)
         self.Center()
         self.SetBackgroundColour(wx.Colour(240, 240, 240))
+        
+        # 修正窗口实际宽度
+        win_width, win_height = self.GetClientSize()
+        rule_width = win_width - 30
 
         # ListView 表格
-        list_styles = wx.LC_REPORT | wx.LC_SINGLE_SEL | wx.LC_EDIT_LABELS
-        self.list_ctrl = wx.ListView(self, style=list_styles)
-        self.list_ctrl.SetMaxSize((-1, 260))
+        self.list_ctrl = wx.ListView(self, 
+            style=wx.LC_REPORT | wx.LC_SINGLE_SEL | wx.LC_EDIT_LABELS)
+        self.list_ctrl.SetMinSize((rule_width, 260))
         self.list_ctrl.InsertColumn(0, "文件名")
         self.list_ctrl.InsertColumn(1, "中文名")
         self.list_ctrl.InsertColumn(2, "格式化名")
@@ -28,22 +31,46 @@ class MyFrame(wx.Frame):
         self.list_ctrl.SetDropTarget(DropFolder(self.list_ctrl))
         
         # 标签容器
-        self.edit_frame = wx.StaticBox(self, label="修改关联条目", size=(960,100))
+        self.edit_frame = wx.StaticBox(self, label="修改关联条目", size=(rule_width,0))
+
+        # 占位阿牛
+        self.lol = wx.Button(self, label="Clear List")
+
+        # 进度条
+        self.progress_bar = wx.Gauge(self, range=100)
+        self.progress_bar.SetMinSize((100, 32))
 
         # 清除按钮
-        self.clear_button = wx.Button(self, label="Clear List")
+        self.clear_button = wx.Button(self, label="清除全部")
+        self.clear_button.SetMinSize((100, 32))
         self.clear_button.Bind(wx.EVT_BUTTON, self.on_clear_list)
+
+        # 识别按钮
+        self.analysis_button = wx.Button(self, label="开始识别")
+        self.analysis_button.SetMinSize((100, 32))
+
+        # 重命名按钮
+        self.rename_button = wx.Button(self, label="重命名全部")
+        self.rename_button.SetMinSize((100, 32))
         
         # 排列窗口
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(self.list_ctrl, 1, wx.EXPAND | wx.ALL, border=12)
+        WINDOW = wx.BoxSizer(wx.VERTICAL)
+        WINDOW.Add(self.list_ctrl, 0, wx.ALIGN_CENTER | wx.TOP | wx.BOTTOM, border=15)
         
-        stsizer = wx.StaticBoxSizer(self.edit_frame, wx.VERTICAL)
-        stsizer.Add(self.clear_button, 1, wx.ALIGN_CENTER)
+        EDIT_FRAME = wx.StaticBoxSizer(self.edit_frame, wx.VERTICAL)
+        EDIT_FRAME.Add(self.lol, 0, wx.ALIGN_CENTER)
 
-        sizer.Add(stsizer, 0, wx.ALIGN_CENTER)
-        self.SetSizer(sizer)
-        print("窗口创建完成")
+        CTRL_FRAME = wx.BoxSizer(wx.HORIZONTAL)
+        CTRL_FRAME.Add(self.progress_bar, 0, wx.LEFT, border=15)
+        CTRL_FRAME.Add(self.clear_button, 0, wx.LEFT, border=15)
+        CTRL_FRAME.Add(self.analysis_button, 0, wx.LEFT, border=15)
+        CTRL_FRAME.Add(self.rename_button, 0, wx.LEFT, border=15)
+
+        WINDOW.Add(EDIT_FRAME, 0, wx.ALIGN_CENTER)
+        WINDOW.Add(CTRL_FRAME, 0, wx.TOP, border=15)
+
+        self.SetSizer(WINDOW)
+        print("窗口创建完成，实际宽度" + str(rule_width))
         # print(f"类中的文件夹列表：{file_path_list}")
     
     def list_selected(self, event):
