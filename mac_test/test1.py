@@ -4,12 +4,23 @@
 import wx
 import os
 
+
 class MyFrame(wx.Frame):
     def __init__(self):
-        super().__init__(None, title="Drag and Drop", size=(400, 300))
-        
-        self.list_ctrl = wx.ListView(self, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
-        self.list_ctrl.InsertColumn(0, "Folder Name")
+        super().__init__(None, title="renamer", size=(1000, 600))
+        self.Center()
+        self.SetBackgroundColour(wx.Colour(240, 240, 240))
+
+        # 创建 ListView 表格
+        list_styles = wx.LC_REPORT | wx.LC_SINGLE_SEL | wx.LC_EDIT_LABELS
+        self.list_ctrl = wx.ListView(self, style=list_styles)
+        self.list_ctrl.SetMaxSize((-1, 400))
+        self.list_ctrl.InsertColumn(0, "文件名")
+        self.list_ctrl.InsertColumn(1, "中文名")
+        self.list_ctrl.InsertColumn(2, "格式化名")
+        self.list_ctrl.SetColumnWidth(0, 260)
+        self.list_ctrl.SetColumnWidth(1, 280)
+        self.list_ctrl.SetColumnWidth(2, 390)
         
         self.list_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_item_selected)
         
@@ -22,7 +33,7 @@ class MyFrame(wx.Frame):
         self.clear_button.Bind(wx.EVT_BUTTON, self.on_clear_list)
         
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(self.list_ctrl, 1, wx.EXPAND)
+        sizer.Add(self.list_ctrl, 1, wx.EXPAND | wx.TOP | wx.LEFT | wx.RIGHT, border=25)
         sizer.Add(self.clear_button, 0, wx.ALIGN_CENTER)
         self.SetSizer(sizer)
     
@@ -65,9 +76,9 @@ class FolderDropTarget(wx.FileDropTarget):
         return True
 
 
-if __name__ == "__main__":
-    app = wx.App()
-    frame = MyFrame()
-    frame.Show()
-    app.MainLoop()
+
+app = wx.App()
+frame = MyFrame()
+frame.Show()
+app.MainLoop()
 
