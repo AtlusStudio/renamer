@@ -6,6 +6,7 @@ import ctypes
 # ctypes.windll.shcore.SetProcessDpiAwareness(1)
 # ScaleFactor=ctypes.windll.shcore.GetScaleFactorForDevice(0)
 
+
 class MyFrame(wx.Frame):
     def __init__(self):
         super().__init__(None, title="renamer", size=(1000, 600), 
@@ -87,20 +88,34 @@ class MyFrame(wx.Frame):
         file_path_exist = self.list_ctrl.GetDropTarget().file_path_exist
         if file_path_exist == set():
             print("请先拖入文件夹")
+            # 禁用按钮
+            # self.analysis_button.Enable(False)
         else:
             for file_path in file_path_exist:
                 file_name = os.path.basename(file_path)
-                
-                pattern = r"\] (.*?)\[|$"
-                match = re.search(pattern, str(file_name))
+                print(file_name)
+
+                lol = "[提取这个内容]这是一些其他的文本[不提取这个内容]"
+                match = re.search(r'\](.*?)\[[(', lol)
                 if match:
-                    romaji_name = match.group(1)
-                    excess = r"BD-BOX|BD-BOXXX"
-                    print(romaji_name)
-                    romaji_name = re.sub(excess, "", romaji_name, flags=re.IGNORECASE)
-                    print("格式化文件名：" + romaji_name)
-                else:
-                    print("非标准的动画文件夹")
+                    extracted_content = match.group(1)
+                    print(extracted_content)
+
+
+
+
+
+                
+                # pattern = r"\] (.*?)\[|$"
+                # match = re.search(pattern, str(file_name))
+                # if match:
+                #     romaji_name = match.group(1)
+                #     excess = r"BD-BOX|BD-BOXXX"
+                #     print(romaji_name)
+                #     romaji_name = re.sub(excess, "", romaji_name, flags=re.IGNORECASE)
+                #     print("格式化文件名：" + romaji_name)
+                # else:
+                #     print("非标准的动画文件夹")
 
 
 
