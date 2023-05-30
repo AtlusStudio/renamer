@@ -20,7 +20,7 @@ def anilist(name):
         }
     }'''
 
-    al_json = {
+    js = {
         'query': query,
         'variables': {'id': name},
     }
@@ -30,9 +30,9 @@ def anilist(name):
     # 3次重试机会，避免网络原因导致请求失败
     retry = 0
     while retry < 3:
-        response = requests.post('https://graphql.anilist.co', json=al_json, headers=headers)
+        response = requests.post('https://graphql.anilist.co', json=js, headers=headers)
 
-        if response.status_code == 201:
+        if response.status_code == 200:
             result = json.loads(response.text.encode().decode('unicode_escape'))
             return result
 
@@ -43,14 +43,13 @@ def anilist(name):
             retry += 1
 
     print(f"在Anilist中请求{name}数据失败")
-    exit()
-
-    # 如果成功，返回请求的字典内容
-    # 如果失败，返回 False
 
 
 
 
-name = "atashi ni Tenshi ga Maiorita! Precious Friends"
-result = anilist(name)
-print(result)
+
+
+
+# name = "atashi ni Tenshi ga Maiorita! Precious Friends"
+# result = anilist(name)
+# print(result)

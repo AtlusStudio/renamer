@@ -4,6 +4,7 @@ import re
 import ctypes
 
 from module import function
+from module import api
 
 # ctypes.windll.shcore.SetProcessDpiAwareness(1)
 # ScaleFactor=ctypes.windll.shcore.GetScaleFactorForDevice(0)
@@ -112,15 +113,23 @@ class MyFrame(wx.Frame):
 
                 # 从文件名提取动画罗马名
                 romaji_name = function.get_romaji_name(file_name, ignored_strings)
-
                 if romaji_name == False:
                     print(f"非标准的动画格式: {romaji_name}")
+                    continue
                 else:
                     print(f"完成处理：当前动画罗马名为{romaji_name}")
 
+                # 向 Anilist 请求数据
+                anilist_content = api.anilist(romaji_name)
+                if anilist_content == None:
+                    print(f"无法在规定时间内请求到{romaji_name}的数据")
+                    continue
+                else:
+                    print(anilist_content)
 
 
-                    
+
+
                
 
 
