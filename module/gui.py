@@ -105,8 +105,10 @@ class MyFrame(wx.Frame):
             print(f"忽略文件名中的{ignored_strings}")
 
             # 循环开始：分析每个文件
+            i = 0
             for file_path in file_path_exist:
-                
+                i += 1
+
                 # 将文件路径转为文件名
                 file_name = os.path.basename(file_path)
                 print(f"正在处理{file_name}")
@@ -139,6 +141,15 @@ class MyFrame(wx.Frame):
                     print(api.b_date)
                     print(api.b_image)
                     print(api.b_id)
+
+                print('【识别完成】')
+
+                # 写入listview
+                j = i - 1
+                self.list_ctrl.SetItem(j, 1, api.b_jp_name)
+
+                print('【写入完成】')
+                
 
 
 
