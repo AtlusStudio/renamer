@@ -120,12 +120,25 @@ class MyFrame(wx.Frame):
                     print(f"完成处理：当前动画罗马名为{romaji_name}")
 
                 # 向 Anilist 请求数据
-                anilist_content = api.anilist(romaji_name)
-                if anilist_content == None:
+                anilist_result = api.anilist(romaji_name)
+                if anilist_result == None:
                     print(f"无法在规定时间内请求到{romaji_name}的数据")
                     continue
                 else:
-                    print(anilist_content)
+                    print(api.a_jp_name)
+                    print(api.a_type)
+
+                # 向 Bangumi 请求数据
+                bangumi_result = api.bangumi(api.a_jp_name)
+                if bangumi_result == None:
+                    print(f"无法在规定时间内请求到{api.a_jp_name}的数据")
+                    continue
+                else:
+                    print(api.b_jp_name)
+                    print(api.b_cn_name)
+                    print(api.b_date)
+                    print(api.b_image)
+                    print(api.b_id)
 
 
 

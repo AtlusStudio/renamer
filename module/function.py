@@ -29,6 +29,9 @@ def get_romaji_name(name, ignored):
 
 
 
+
+
+
 # file_name = "atashi ni Tenshi ga Maiorita! Precious Friends"
 # ignored_strings = ["BD-BOX", "BD"]
 # romaji_name = get_romaji_name(file_name, ignored_strings)

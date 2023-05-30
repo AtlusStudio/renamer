@@ -1,56 +1,27 @@
 import requests
-import json
-import time
 
-
-# 向Anilist请求数据
-def anilist(name):
+def get_chinese_name(anime_name):
+    url = f"https://myanimelist.net/search/all?q={anime_name}"
     headers = {
-        'accept': 'application/json',
-        'User-Agent': 'akko/bgm-renamer'
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.190 Safari/537.36",
     }
 
-    query = '''
-    query ($id: String) {
-        Media (search: $id, type: ANIME) {
-            title {
-                native
-            }
-            format
-        }
-    }'''
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
 
-    al_json = {
-        'query': query,
-        'variables': {'id': name},
-    }
+    start_index = response.text.find('<a class="hoverinfo_trigger fw-b" href="') + len('<a class="hoverinfo_trigger fw-b" href="')
+    end_index = response.text.find('">', start_index)
+    anime_url = response.text[start_index:end_index]
 
-    print(f"正在向Anilist请求{name}的数据")
+    response = requests.get(anime_url, headers=headers)
+    response.raise_for_status()
 
-    # 3次重试机会，避免网络原因导致请求失败
-    retry = 0
-    while retry < 3:
-        response = requests.post('https://graphql.anilist.co', json=al_json, headers=headers)
+    start_index = response.text.find('<span itemprop="name">') + len('<span itemprop="name">')
+    end_index = response.text.find('</span>', start_index)
+    chinese_name = response.text[start_index:end_index]
 
-        if response.status_code == 201:
-            result = json.loads(response.text.encode().decode('unicode_escape'))
-            return result
+    return chinese_name
 
-        # 若请求失败，等待0.5秒重试
-        else:
-            print("Anilist请求失败，重试" + str(retry + 1))
-            time.sleep(0.5)
-            retry += 1
-
-    print(f"在Anilist中请求{name}数据失败")
-    exit()
-
-    # 如果成功，返回请求的字典内容
-    # 如果失败，返回 False
-
-
-
-
-name = "atashi ni Tenshi ga Maiorita! Precious Friends"
-result = anilist(name)
-print(result)
+anime_name = input("请输入动画的英文名：")
+chinese_name = get_chinese_name(anime_name)
+print(f"动画的中文名是：{chinese_name}")
