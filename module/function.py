@@ -1,10 +1,8 @@
 import re
 
 
-
-# 将输入的动画文件夹 file_name 格式化为动画名 romaji_name
+# 将输入的动画文件夹 file_name 提取出动画名 romaji_name
 def get_romaji_name(name, ignored):
-
     # 将指定字符加入忽略列表
     pattern_ignored = '|'.join(ignored)
 
@@ -23,15 +21,7 @@ def get_romaji_name(name, ignored):
         # 使用 strip() 去除首尾空格
         romaji_name = result.group(1).strip()
     else:
+        # 非标准的动画格式
         romaji_name = False
-        print(f"非标准的动画格式: {name}")
 
     return romaji_name
-
-
-
-file_name = "[Moozzi2] Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e S2 BD-BOX[ x265-10Bit Ver. ] - TV + SP"
-ignored_strings = ["BD-BOX", "BD"]
-
-romaji_name = get_romaji_name(file_name, ignored_strings)
-print(romaji_name)

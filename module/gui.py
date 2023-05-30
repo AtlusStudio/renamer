@@ -3,6 +3,8 @@ import os
 import re
 import ctypes
 
+from module import function
+
 # ctypes.windll.shcore.SetProcessDpiAwareness(1)
 # ScaleFactor=ctypes.windll.shcore.GetScaleFactorForDevice(0)
 
@@ -80,43 +82,46 @@ class MyFrame(wx.Frame):
         print("窗口创建完成，实际宽度" + str(rule_width) + "像素")
 
     def list_selected(self, event):
+        # 选择文件夹时输出当前选择的文件名
         selected_item = event.GetItem()
         file_name = self.list_ctrl.GetItemText(selected_item.GetId(), 0)
         print(f"当前选择文件夹: {file_name}")
 
     def start_analysis(self, event):
+        # 调用获取到的文件路径列表
         file_path_exist = self.list_ctrl.GetDropTarget().file_path_exist
+
+        # 加载文件名忽略列表
+        ignored_strings = ["BD-BOX", "BD"]
+
+        # 判断列表是否为空
         if file_path_exist == set():
             print("请先拖入文件夹")
             # 禁用按钮
             # self.analysis_button.Enable(False)
         else:
+            # 输入忽略列表
+            print(f"忽略文件名中的{ignored_strings}")
+
+            # 循环开始：分析每个文件
             for file_path in file_path_exist:
-                file_name = os.path.basename(file_path)
-                print(file_name)
-
-                lol = "[提取这个内容]这是一些其他的文本[不提取这个内容]"
-                match = re.search(r'\](.*?)\[[(', lol)
-                if match:
-                    extracted_content = match.group(1)
-                    print(extracted_content)
-
-
-
-
-
                 
-                # pattern = r"\] (.*?)\[|$"
-                # match = re.search(pattern, str(file_name))
-                # if match:
-                #     romaji_name = match.group(1)
-                #     excess = r"BD-BOX|BD-BOXXX"
-                #     print(romaji_name)
-                #     romaji_name = re.sub(excess, "", romaji_name, flags=re.IGNORECASE)
-                #     print("格式化文件名：" + romaji_name)
-                # else:
-                #     print("非标准的动画文件夹")
+                # 将文件路径转为文件名
+                file_name = os.path.basename(file_path)
+                print(f"正在处理{file_name}")
 
+                # 从文件名提取动画罗马名
+                romaji_name = function.get_romaji_name(file_name, ignored_strings)
+
+                if romaji_name == False:
+                    print(f"非标准的动画格式: {romaji_name}")
+                else:
+                    print(f"完成处理：当前动画罗马名为{romaji_name}")
+
+
+
+                    
+               
 
 
     def on_clear_list(self, event):
