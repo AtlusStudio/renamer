@@ -17,8 +17,8 @@ class MyFrame(wx.Frame):
         self.Center()
         self.SetBackgroundColour(wx.Colour(240, 240, 240))
 
-        # 创建集合用于接收拖入的文件列表
-        self.file_path_exist = set()
+        # 创建列表而非集合，方便排序
+        self.file_path_exist = []
         
         # 修正窗口实际宽度
         win_width, win_height = self.GetClientSize()
@@ -105,9 +105,8 @@ class MyFrame(wx.Frame):
             print(f"忽略文件名中的{ignored_strings}")
 
             # 循环开始：分析每个文件
-            i = 0
+            column_number = 0
             for file_path in file_path_exist:
-                i += 1
 
                 # 将文件路径转为文件名
                 file_name = os.path.basename(file_path)
@@ -117,6 +116,7 @@ class MyFrame(wx.Frame):
                 romaji_name = function.get_romaji_name(file_name, ignored_strings)
                 if romaji_name == False:
                     print(f"非标准的动画格式: {romaji_name}")
+                    column_number += 1
                     continue
                 else:
                     print(f"完成处理：当前动画罗马名为{romaji_name}")
@@ -125,6 +125,7 @@ class MyFrame(wx.Frame):
                 anilist_result = api.anilist(romaji_name)
                 if anilist_result == None:
                     print(f"无法在规定时间内请求到{romaji_name}的数据")
+                    column_number += 1
                     continue
                 else:
                     print(api.a_jp_name)
@@ -134,21 +135,19 @@ class MyFrame(wx.Frame):
                 bangumi_result = api.bangumi(api.a_jp_name)
                 if bangumi_result == None:
                     print(f"无法在规定时间内请求到{api.a_jp_name}的数据")
+                    column_number += 1
                     continue
                 else:
                     print(api.b_jp_name)
                     print(api.b_cn_name)
-                    print(api.b_date)
                     print(api.b_image)
                     print(api.b_id)
 
-                print('【识别完成】')
-
                 # 写入listview
-                j = i - 1
-                self.list_ctrl.SetItem(j, 1, api.b_jp_name)
-
-                print('【写入完成】')
+                self.list_ctrl.SetItem(column_number, 1, api.b_cn_name)
+                print(f'写入到第{column_number}行')
+                column_number += 1
+                
                 
 
 
@@ -159,7 +158,7 @@ class MyFrame(wx.Frame):
 
     def on_clear_list(self, event):
         self.list_ctrl.DeleteAllItems()
-        file_path_exist = set()
+        file_path_exist = []
         print("已清除所有文件夹")
 
 
@@ -174,12 +173,14 @@ class DropFolder(wx.FileDropTarget):
             # 判断是否为文件夹
             if os.path.isdir(file_path):
                 file_name = os.path.basename(file_path)
+
                 # 判断是否存在相同文件夹，并写入 file_path_exist 列表
                 if file_path not in self.file_path_exist:
                     self.window.InsertItem(self.window.GetItemCount(), file_name)
-                    self.file_path_exist.add(file_path)
+                    self.file_path_exist.append(file_path)
                     print(f"新增了{file_name}")
                     print(f"总路径列表：{self.file_path_exist}")
+                    print(type(self.file_path_exist))
                 else:
                     print(f"{file_name}已存在")
             else:
