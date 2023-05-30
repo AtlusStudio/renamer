@@ -2,6 +2,7 @@ import wx
 import os
 import re
 import ctypes
+import asyncio
 
 from module import function
 from module import api
@@ -158,7 +159,7 @@ class MyFrame(wx.Frame):
 
     def on_clear_list(self, event):
         self.list_ctrl.DeleteAllItems()
-        file_path_exist = []
+        self.file_path_exist = []
         print("已清除所有文件夹")
 
 
