@@ -1,11 +1,10 @@
 import wx
 import os
 import re
-import ctypes
-import asyncio
+import ctypes  # 高分屏适配
+import asyncio  # 异步IO
 
 from module import function
-from module import api
 
 # ctypes.windll.shcore.SetProcessDpiAwareness(1)
 # ScaleFactor=ctypes.windll.shcore.GetScaleFactorForDevice(0)
@@ -95,68 +94,37 @@ class MyFrame(wx.Frame):
         # 调用获取到的文件路径列表
         file_path_exist = self.list_ctrl.GetDropTarget().file_path_exist
 
-        # 加载文件名忽略列表
-        ignored_strings = ["BD-BOX", "BD"]
-
         # 判断列表是否为空
         if file_path_exist == set():
             print("请先拖入文件夹")
             # 禁用按钮
             # self.analysis_button.Enable(False)
         else:
-            # 输入忽略列表
-            print(f"忽略文件名中的{ignored_strings}")
+            # 创建列表，写入所有抓取的数据
+            anime_list = []
 
             # 循环开始：分析每个文件
-            column_number = 0
+            list_id = 0
             for file_path in file_path_exist:
 
-                # 将文件路径转为文件名
+                # 文件路径转为文件名
                 file_name = os.path.basename(file_path)
                 print(f"正在处理{file_name}")
 
-                # 从文件名提取动画罗马名
-                romaji_name = function.get_romaji_name(file_name, ignored_strings)
-                if romaji_name == False:
-                    print(f"非标准的动画格式: {romaji_name}")
-                    column_number += 1
-                    continue
-                else:
-                    print(f"完成处理：当前动画罗马名为{romaji_name}")
+                # 文件名 file_name 获取的数据，合并入列表 anime_list
+                this_anime_dict = function.get_anime_info(list_id, file_name)
+                anime_list.append(this_anime_dict)
+                print(anime_list)
 
-                # 向 Anilist 请求数据
-                anilist_result = api.anilist(romaji_name)
-                if anilist_result == None:
-                    print(f"无法在规定时间内请求到{romaji_name}的数据")
-                    column_number += 1
-                    continue
-                else:
-                    print(api.a_jp_name)
-                    print(api.a_type)
-
-                # 向 Bangumi 请求数据
-                bangumi_result = api.bangumi(api.a_jp_name)
-                if bangumi_result == None:
-                    print(f"无法在规定时间内请求到{api.a_jp_name}的数据")
-                    column_number += 1
-                    continue
-                else:
-                    print(api.b_jp_name)
-                    print(api.b_cn_name)
-                    print(api.b_image)
-                    print(api.b_id)
-
-                # 写入listview
-                self.list_ctrl.SetItem(column_number, 1, api.b_cn_name)
-                print(f'写入到第{column_number}行')
-                column_number += 1
+                # # 写入listview
+                # self.list_ctrl.SetItem(list_id, 1, api.b_cn_name)
+                # print(f'写入到第{list_id}行')
+                # list_id += 1
                 
-                
+                # 进入下一轮前修改 ID
+                list_id += 1   
 
 
-
-
-               
 
 
     def on_clear_list(self, event):
@@ -182,8 +150,7 @@ class DropFolder(wx.FileDropTarget):
                     self.window.InsertItem(self.window.GetItemCount(), file_name)
                     self.file_path_exist.append(file_path)
                     print(f"新增了{file_name}")
-                    print(f"总路径列表：{self.file_path_exist}")
-                    print(type(self.file_path_exist))
+                    # print(f"总路径列表：{self.file_path_exist}")
                 else:
                     print(f"{file_name}已存在")
             else:

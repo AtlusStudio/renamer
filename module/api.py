@@ -1,7 +1,7 @@
 import requests
 import json
-import time
-import arrow
+import time  # 延迟操作
+import arrow  # 处理时间格式
 
 
 # 向 Anilist 请求数据
@@ -37,10 +37,6 @@ def anilist(name):
             result = json.loads(response.text.encode().decode('unicode_escape'))
             print(f"成功获取到{name}的Anilist数据")
 
-            # 定义全局变量
-            global a_jp_name
-            global a_type
-
             a_jp_name = result["data"]["Media"]["title"]["native"]
             a_type = result["data"]["Media"]["format"].lower()
 
@@ -55,7 +51,12 @@ def anilist(name):
                 a_type = "XBD"
                 print("未知的动画类型，注意检查")
 
-            return result
+            # 将上述元素放入字典
+            a_dict = dict()
+            a_dict["a_jp_name"] = a_jp_name
+            a_dict["a_type"] = a_type
+
+            return a_dict
 
         # 若请求失败，等待0.5秒重试
         else:
@@ -140,19 +141,19 @@ def bangumi(name):
             result = json.loads(response.text)
             print(f"成功获取到{name}的Bangumi数据")
 
-            # 定义全局变量
-            global b_jp_name
-            global b_cn_name
-            global b_date
-            global b_image
-            global b_id
-
             b_jp_name = result["list"][0]["name"]
             b_cn_name = result["list"][0]["name_cn"]
             b_image = result["list"][0]["images"]["large"]
             b_id = result["list"][0]["id"]
 
-            return result
+            # 将上述元素放入字典
+            b_dict = dict()
+            b_dict["b_jp_name"] = b_jp_name
+            b_dict["b_cn_name"] = b_cn_name
+            b_dict["b_image"] = b_image
+            b_dict["b_id"] = b_id
+
+            return b_dict
 
         # 若请求失败，等待0.5秒重试
         else:
@@ -172,14 +173,13 @@ def bangumi(name):
 
 # a_result = anilist(name)
 # print(a_result)
-# print(a_jp_name)
-# print(a_type)
 
-# b_result = bangumi("Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e S2")
-# # print(b_result)
-# print(b_jp_name)
-# print(b_cn_name)
-# # print(b_date)
-# print(b_image)
-# print(b_id)
+# b_result = bangumi(a_result["a_jp_name"])
+# print(b_result)
+
+# result = {**a_result, **b_result}
+# print(result)
+
+
+
 
