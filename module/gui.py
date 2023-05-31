@@ -113,19 +113,21 @@ class MyFrame(wx.Frame):
                 print(anime_list)
 
                 # 写入listview
+                # 如果没有 b_originate_name 说明没有执行到最后一步
+                # 重写 file_file 并展示在 listview 避免错位
                 this_anime = anime_list[list_id]
-                if "b_cn_name" in this_anime:
+                if "b_originate_name" in this_anime:
+                    file_name = anime_list[list_id]["file_name"]
                     b_cn_name = anime_list[list_id]["b_cn_name"]
+                    b_originate_name = anime_list[list_id]["b_originate_name"]
+                    self.list_ctrl.SetItem(list_id, 0, file_name)
                     self.list_ctrl.SetItem(list_id, 1, b_cn_name)
-                    self.list_ctrl.SetItem(list_id, 2, b_cn_name)
+                    self.list_ctrl.SetItem(list_id, 2, b_originate_name)
                 else:
                     print("该动画未获取到内容，已跳过")
                 
                 # 进入下一轮前修改 ID
-                list_id += 1   
-
-
-
+                list_id += 1
 
     def on_clear_list(self, event):
         self.list_ctrl.DeleteAllItems()

@@ -39,13 +39,14 @@ def get_romaji_name(name):
 def get_anime_info(list_id, path):
     this_anime_dict = dict()
 
-    # 1. 写入处理的文件序号
+    # 写入处理的文件序号
     this_anime_dict["id"] = list_id
     print(f"当前处理的文件ID: {list_id}")
 
     # 文件路径转为文件名
     this_anime_dict["path"] = path
     file_name = os.path.basename(path)
+    this_anime_dict["file_name"] = file_name
     print(f"正在处理{file_name}")
 
     # 从文件名提取动画罗马名
@@ -95,6 +96,7 @@ def get_anime_info(list_id, path):
         print(f"自身或上一季度是{prev_name}")
 
     print(f"搜索完成，该动画第一季为{prev_name}")
+    this_anime_dict["b_originate_name"] = prev_name
 
 
     
