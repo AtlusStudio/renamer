@@ -1,20 +1,16 @@
-# 指南：
-# column_number = 0
-# 创建字典 = 空
-# for file_path in file_path_exist:
-#     转path为file name
-#     anime0 = def（将输入的名字请求出动画中日文名、日期等变量）
-#     字典携带column_number写入数据
+    id1 = str(bangumi_result["b_id"])
+    b_cn_name = bangumi_result["b_cn_name"]
+    prev_id = ""
+
+    print(f"{b_cn_name}的ID为{b_id}")
+    bangumi_prev_result = api.bangumi_previous(b_id, b_cn_name)
+    id2 = bangumi_prev_result[0]
+
+    while id1 != id2:
+        id1 = id2
+
+        bangumi_prev_result = api.bangumi_previous(b_id, b_cn_name)
+        id2 = bangumi_prev_result[0]
 
 
-
-
-def test():
-    x = 1000
-    y = 20
-    z = "wow"
-    return x, y, z
-
-deff = test()
-print(type(deff))
-
+    print("ok")
