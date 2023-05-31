@@ -12,10 +12,10 @@ from module import function
 
 class MyFrame(wx.Frame):
     def __init__(self):
-        super().__init__(None, title="renamer", size=(1000, 600), 
+        super().__init__(None, title="renamer", size=(1000, 650), 
             style=wx.DEFAULT_FRAME_STYLE & ~wx.RESIZE_BORDER)
         self.Center()
-        self.SetBackgroundColour(wx.Colour(240, 240, 240))
+        self.SetBackgroundColour(wx.Colour(248, 248, 248))
 
         # 创建列表而非集合，方便排序
         self.file_path_exist = []
@@ -41,10 +41,28 @@ class MyFrame(wx.Frame):
         self.list_ctrl.SetDropTarget(DropFolder(self.list_ctrl, self.file_path_exist))
         
         # 标签容器
-        self.edit_frame = wx.StaticBox(self, label="修改关联条目", size=(rule_width,0))
+        self.edit_frame = wx.StaticBox(self, label="编辑关联条目", size=(rule_width,0))
 
-        # 占位
-        self.lol = wx.Button(self, label="Clear List")
+        # 图片
+        img_url = "img/default.jpg"
+        self.image = wx.Image(img_url, wx.BITMAP_TYPE_ANY)
+        self.scaled = self.image.Scale(145, 210, wx.IMAGE_QUALITY_HIGH)
+        self.bitmap = wx.StaticBitmap(self, wx.ID_ANY, wx.Bitmap(self.scaled))
+
+        # 分割线
+        # self.vline = wx.StaticLine(self, style=wx.LI_VERTICAL)
+
+        # 标签
+        label_width = win_width - 295
+        print(label_width)
+        self.lbt_file_name = wx.StaticText(self, label="文件名", style=wx.ALIGN_LEFT)
+        self.lbt_file_name.SetMinSize((60, -1))
+        self.lb_file_name = wx.StaticText(self, label="[Moozzi2] Tensei Oujo to Tensai Reijou no Mahou Kakumei BD-BOX [ x265-10Bit Ver. ] - TV + SP", style=wx.ALIGN_LEFT)
+        self.lb_file_name.SetMinSize((label_width, -1))
+
+        self.lbt_a_jp_name = wx.StaticText(self, label="动画名", style=wx.ALIGN_LEFT)
+        self.lbt_a_jp_name.SetMinSize((60, -1))
+        self.lb_a_jp_name = wx.StaticText(self, label="balabala", style=wx.ALIGN_LEFT)
 
         # 进度条
         self.progress_bar = wx.Gauge(self, range=100)
@@ -68,9 +86,23 @@ class MyFrame(wx.Frame):
         # 排列窗口
         WINDOW = wx.BoxSizer(wx.VERTICAL)
         WINDOW.Add(self.list_ctrl, 0, wx.ALIGN_CENTER | wx.TOP | wx.BOTTOM, border=15)
+
+        LABEL_FRAME_1 = wx.BoxSizer(wx.HORIZONTAL)
+        LABEL_FRAME_1.Add(self.lbt_file_name, 0, wx.TOP | wx.BOTTOM, border=5)
+        LABEL_FRAME_1.Add(self.lb_file_name, 0, wx.TOP | wx.BOTTOM, border=5)
+
+        LABEL_FRAME_2 = wx.BoxSizer(wx.HORIZONTAL)
+        LABEL_FRAME_2.Add(self.lbt_a_jp_name, 0, wx.TOP | wx.BOTTOM, border=5)
+        LABEL_FRAME_2.Add(self.lb_a_jp_name, 0, wx.TOP | wx.BOTTOM, border=5)
+
+        LABEL_FRAME = wx.BoxSizer(wx.VERTICAL)
+        LABEL_FRAME.Add(LABEL_FRAME_1, 0)
+        LABEL_FRAME.Add(LABEL_FRAME_2, 0)
         
-        EDIT_FRAME = wx.StaticBoxSizer(self.edit_frame, wx.VERTICAL)
-        EDIT_FRAME.Add(self.lol, 0, wx.ALIGN_CENTER)
+        EDIT_FRAME = wx.StaticBoxSizer(self.edit_frame, wx.HORIZONTAL)
+        EDIT_FRAME.Add(self.bitmap, 0, wx.ALL, border=10)
+        # EDIT_FRAME.Add(self.vline, 0, wx.EXPAND | wx.ALL, border=10)
+        EDIT_FRAME.Add(LABEL_FRAME, 0, wx.TOP | wx.LEFT, border=10)
 
         CTRL_FRAME = wx.BoxSizer(wx.HORIZONTAL)
         CTRL_FRAME.Add(self.progress_bar, 0, wx.CENTER)

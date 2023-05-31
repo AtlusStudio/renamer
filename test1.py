@@ -1,16 +1,20 @@
-    id1 = str(bangumi_result["b_id"])
-    b_cn_name = bangumi_result["b_cn_name"]
-    prev_id = ""
+import wx
 
-    print(f"{b_cn_name}的ID为{b_id}")
-    bangumi_prev_result = api.bangumi_previous(b_id, b_cn_name)
-    id2 = bangumi_prev_result[0]
+# 创建应用程序对象
+app = wx.App()
 
-    while id1 != id2:
-        id1 = id2
+# 创建顶级窗口
+frame = wx.Frame(None, title="标识示例")
 
-        bangumi_prev_result = api.bangumi_previous(b_id, b_cn_name)
-        id2 = bangumi_prev_result[0]
+# 创建面板
+panel = wx.Panel(frame)
 
+# 创建标签
+label = wx.StaticText(panel, label="这是一个很长的文本标签，将被截断显示")
+label.Wrap(100)  # 设置换行宽度为100像素
 
-    print("ok")
+# 显示窗口
+frame.Show()
+
+# 进入应用程序主循环
+app.MainLoop()
