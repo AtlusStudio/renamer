@@ -54,7 +54,9 @@ def anilist(name):
             # 将上述元素放入字典
             a_dict = dict()
             a_dict["a_jp_name"] = a_jp_name
+            print(a_jp_name)
             a_dict["a_type"] = a_type
+            print(a_type)
 
             return a_dict
 
@@ -120,7 +122,7 @@ def anilist(name):
 #     print(f"在Bangumi中请求{name}数据失败")
 
 
-# 向 Bangumi 请求数据(search/subject/keywords)
+# 向 Bangumi Search 请求数据(search/subject/keywords)
 # https://bangumi.github.io/api/
 def bangumi(name):
     headers = {

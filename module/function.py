@@ -1,3 +1,4 @@
+import os
 import re
 
 from module import api
@@ -35,15 +36,20 @@ def get_romaji_name(name):
 
 # 输入待分析的文件序号
 # 输入动画文件夹 file_name，输出 API 抓取后的所有内容
-def get_anime_info(list_id, name):
+def get_anime_info(list_id, path):
     this_anime_dict = dict()
 
     # 1. 写入处理的文件序号
     this_anime_dict["id"] = list_id
     print(f"当前处理的文件ID: {list_id}")
 
+    # 文件路径转为文件名
+    this_anime_dict["path"] = path
+    file_name = os.path.basename(path)
+    print(f"正在处理{file_name}")
+
     # 从文件名提取动画罗马名
-    romaji_name = get_romaji_name(name)
+    romaji_name = get_romaji_name(file_name)
     if romaji_name == False:
         print(f"非标准的动画格式: {romaji_name}")
         return this_anime_dict
@@ -59,7 +65,7 @@ def get_anime_info(list_id, name):
     else:
         this_anime_dict.update(anilist_result)
 
-    # 向 Bangumi 请求数据
+    # 向 Bangumi Search 请求数据
     a_jp_name = anilist_result["a_jp_name"]
     bangumi_result = api.bangumi(a_jp_name)
     if bangumi_result == None:

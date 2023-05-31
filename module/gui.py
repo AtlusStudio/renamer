@@ -107,19 +107,19 @@ class MyFrame(wx.Frame):
             list_id = 0
             for file_path in file_path_exist:
 
-                # 文件路径转为文件名
-                file_name = os.path.basename(file_path)
-                print(f"正在处理{file_name}")
-
-                # 文件名 file_name 获取的数据，合并入列表 anime_list
-                this_anime_dict = function.get_anime_info(list_id, file_name)
+                # 通过文件路径 file_path 获取数据，合并入列表 anime_list
+                this_anime_dict = function.get_anime_info(list_id, file_path)
                 anime_list.append(this_anime_dict)
                 print(anime_list)
 
-                # # 写入listview
-                # self.list_ctrl.SetItem(list_id, 1, api.b_cn_name)
-                # print(f'写入到第{list_id}行')
-                # list_id += 1
+                # 写入listview
+                this_anime = anime_list[list_id]
+                if "b_cn_name" in this_anime:
+                    b_cn_name = anime_list[list_id]["b_cn_name"]
+                    self.list_ctrl.SetItem(list_id, 1, b_cn_name)
+                    self.list_ctrl.SetItem(list_id, 2, b_cn_name)
+                else:
+                    print("该动画未获取到内容，已跳过")
                 
                 # 进入下一轮前修改 ID
                 list_id += 1   
