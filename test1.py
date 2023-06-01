@@ -1,32 +1,28 @@
-from qtpy.QtWidgets import QApplication, QMainWindow, QLabel
-from qtpy.QtCore import Qt, QMimeData
+import wx
 import sys
 
-
-class MainWindow(QMainWindow):
+class MyFrame(wx.Frame):
     def __init__(self):
-        super().__init__()
+        super().__init__(parent=None, title='Print to StatusBar Example')
+        self.panel = wx.Panel(self)
+        self.status_bar = self.CreateStatusBar()
 
-        self.setWindowTitle("文件夹路径显示")
-        self.setAcceptDrops(True)
+        # 重定向输出到状态栏
+        sys.stdout = StatusBarPrint(self.status_bar)
 
-        self.label = QLabel(self)
-        self.label.setAlignment(Qt.AlignCenter)
-        self.setCentralWidget(self.label)
+        # 测试输出
+        print("Hello, World!")
 
-    def dragEnterEvent(self, event):
-        if event.mimeData().hasUrls():
-            event.acceptProposedAction()
+        self.Show()
 
-    def dropEvent(self, event):
-        urls = event.mimeData().urls()
-        if urls:
-            file_path = urls[0].toLocalFile()
-            self.label.setText(file_path)
+class StatusBarPrint:
+    def __init__(self, status_bar):
+        self.status_bar = status_bar
 
+    def write(self, text):
+        self.status_bar.SetStatusText(text.strip())
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = MainWindow()
-    window.show()
-    sys.exit(app.exec_())
+if __name__ == '__main__':
+    app = wx.App()
+    frame = MyFrame()
+    app.MainLoop()

@@ -5,27 +5,27 @@ import asyncio  # 异步IO
 
 from module import function
 
+
 # ctypes.windll.shcore.SetProcessDpiAwareness(1)
 # ScaleFactor=ctypes.windll.shcore.GetScaleFactorForDevice(0)
 
 
 class MyFrame(wx.Frame):
     def __init__(self):
-        super().__init__(None, title="renamer", size=(1000, 650), 
-            style=wx.DEFAULT_FRAME_STYLE & ~wx.RESIZE_BORDER)
+        super().__init__(None, title="renamer", size=(1000, 670),
+                         style=wx.DEFAULT_FRAME_STYLE & ~wx.RESIZE_BORDER)
         self.Center()
-        self.SetBackgroundColour(wx.Colour(248, 248, 248))
+        self.SetBackgroundColour(wx.Colour(245, 245, 245))
 
         # 创建列表而非集合，方便排序
         self.file_path_exist = []
-        
+
         # 修正窗口实际宽度
         win_width, win_height = self.GetClientSize()
         rule_width = win_width - 30
 
         # ListView 表格
-        self.list_ctrl = wx.ListView(self, 
-            style=wx.LC_REPORT | wx.LC_SINGLE_SEL | wx.LC_EDIT_LABELS)
+        self.list_ctrl = wx.ListView(self, style=wx.LC_REPORT | wx.LC_SINGLE_SEL | wx.LC_EDIT_LABELS)
         self.list_ctrl.SetMinSize((rule_width, 260))
         self.list_ctrl.InsertColumn(0, "文件名")
         self.list_ctrl.InsertColumn(1, "动画名（本季）")
@@ -35,10 +35,10 @@ class MyFrame(wx.Frame):
         self.list_ctrl.SetColumnWidth(1, 180)
         self.list_ctrl.SetColumnWidth(2, 180)
         self.list_ctrl.SetColumnWidth(3, 330)
-        
+
         self.list_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self.list_selected)
         self.list_ctrl.SetDropTarget(DropFolder(self.list_ctrl, self.file_path_exist))
-        
+
         # 标签容器
         self.edit_frame = wx.StaticBox(self, label="编辑关联条目", size=(rule_width, 0))
 
@@ -49,18 +49,46 @@ class MyFrame(wx.Frame):
         self.bitmap = wx.StaticBitmap(self, wx.ID_ANY, wx.Bitmap(self.scaled))
 
         # 分割线
-        # self.vline = wx.StaticLine(self, style=wx.LI_VERTICAL)
+        self.label_line1 = wx.StaticLine(self, style=wx.LI_HORIZONTAL)
+        self.label_line2 = wx.StaticLine(self, style=wx.LI_HORIZONTAL)
 
         # 标签
-        label_width = win_width - 295
-        self.lbt_file_name = wx.StaticText(self, label="文件名", style=wx.ALIGN_LEFT)
-        self.lbt_file_name.SetMinSize((60, -1))
-        self.lb_file_name = wx.StaticText(self, label="[Moozzi2] Tensei Oujo to Tensai Reijou no Mahou Kakumei BD-BOX [ x265-10Bit Ver. ] - TV + SP", style=wx.ALIGN_LEFT)
+        label_width = win_width - 230
+
+        file_name = ""
+        lbl_file_name = f"文件名：{file_name}"
+        self.lb_file_name = wx.StaticText(self, label=lbl_file_name, style=wx.ALIGN_LEFT)
         self.lb_file_name.SetMinSize((label_width, -1))
 
-        self.lbt_a_jp_name = wx.StaticText(self, label="动画名", style=wx.ALIGN_LEFT)
-        self.lbt_a_jp_name.SetMinSize((60, -1))
-        self.lb_a_jp_name = wx.StaticText(self, label="balabala", style=wx.ALIGN_LEFT)
+        file_path = ""
+        lbl_file_path = f"文件路径:{file_path}"
+        self.lb_file_path = wx.StaticText(self, label=lbl_file_path, style=wx.ALIGN_LEFT)
+        self.lb_file_path.SetMinSize((label_width, -1))
+
+        # b_originate_name = ""
+        # lbl_b_originate_name = f"动画名(首季):{b_originate_name}"
+        # self.lb_b_originate_name = wx.StaticText(self, label=lbl_b_originate_name, style=wx.ALIGN_LEFT)
+        # self.lb_b_originate_name.SetMinSize((label_width, -1))
+
+        b_cn_name = ""
+        lbl_b_cn_name = f"动画名(中文):{b_cn_name}"
+        self.lb_b_cn_name = wx.StaticText(self, label=lbl_b_cn_name, style=wx.ALIGN_LEFT)
+        self.lb_b_cn_name.SetMinSize((label_width, -1))
+
+        b_jp_name = ""
+        lbl_b_jp_name = f"动画名(日文):{b_jp_name}"
+        self.lb_b_jp_name = wx.StaticText(self, label=lbl_b_jp_name, style=wx.ALIGN_LEFT)
+        self.lb_b_jp_name.SetMinSize((label_width, -1))
+
+        b_date = ""
+        lbl_b_date = f"首播日期:{b_date}"
+        self.lb_b_date = wx.StaticText(self, label=lbl_b_date, style=wx.ALIGN_LEFT)
+        self.lb_b_date.SetMinSize((label_width, -1))
+
+        final_rename = ""
+        lbl_final_rename = f"重命名结果:{final_rename}"
+        self.lbl_final_rename = wx.StaticText(self, label=lbl_final_rename, style=wx.ALIGN_LEFT)
+        self.lbl_final_rename.SetMinSize((label_width, -1))
 
         # 进度条
         self.progress_bar = wx.Gauge(self, range=100)
@@ -80,26 +108,25 @@ class MyFrame(wx.Frame):
         # 重命名按钮
         self.rename_button = wx.Button(self, label="重命名全部")
         self.rename_button.SetMinSize((100, 32))
-        
+
+        # 状态栏
+        self.statusbar = self.CreateStatusBar()
+        self.statusbar.SetStatusText("这是状态栏")
+
         # 排列窗口
-        WINDOW = wx.BoxSizer(wx.VERTICAL)
-        WINDOW.Add(self.list_ctrl, 0, wx.ALIGN_CENTER | wx.TOP | wx.BOTTOM, border=15)
-
-        LABEL_FRAME_1 = wx.BoxSizer(wx.HORIZONTAL)
-        LABEL_FRAME_1.Add(self.lbt_file_name, 0, wx.TOP | wx.BOTTOM, border=5)
-        LABEL_FRAME_1.Add(self.lb_file_name, 0, wx.TOP | wx.BOTTOM, border=5)
-
-        LABEL_FRAME_2 = wx.BoxSizer(wx.HORIZONTAL)
-        LABEL_FRAME_2.Add(self.lbt_a_jp_name, 0, wx.TOP | wx.BOTTOM, border=5)
-        LABEL_FRAME_2.Add(self.lb_a_jp_name, 0, wx.TOP | wx.BOTTOM, border=5)
-
         LABEL_FRAME = wx.BoxSizer(wx.VERTICAL)
-        LABEL_FRAME.Add(LABEL_FRAME_1, 0)
-        LABEL_FRAME.Add(LABEL_FRAME_2, 0)
-        
+        LABEL_FRAME.Add(self.lb_file_name, 0, wx.TOP | wx.BOTTOM, border=5)
+        LABEL_FRAME.Add(self.lb_file_path, 0, wx.TOP | wx.BOTTOM, border=5)
+        LABEL_FRAME.Add(self.label_line1, 0, wx.EXPAND | wx.TOP | wx.BOTTOM , border=10)
+        # LABEL_FRAME.Add(self.lb_b_originate_name, 0, wx.TOP | wx.BOTTOM, border=5)
+        LABEL_FRAME.Add(self.lb_b_cn_name, 0, wx.TOP | wx.BOTTOM, border=5)
+        LABEL_FRAME.Add(self.lb_b_jp_name, 0, wx.TOP | wx.BOTTOM, border=5)
+        LABEL_FRAME.Add(self.lb_b_date, 0, wx.TOP | wx.BOTTOM, border=5)
+        LABEL_FRAME.Add(self.label_line2, 0, wx.EXPAND | wx.TOP | wx.BOTTOM, border=10)
+        LABEL_FRAME.Add(self.lbl_final_rename, 0, wx.TOP | wx.BOTTOM, border=5)
+
         EDIT_FRAME = wx.StaticBoxSizer(self.edit_frame, wx.HORIZONTAL)
         EDIT_FRAME.Add(self.bitmap, 0, wx.ALL, border=10)
-        # EDIT_FRAME.Add(self.vline, 0, wx.EXPAND | wx.ALL, border=10)
         EDIT_FRAME.Add(LABEL_FRAME, 0, wx.TOP | wx.LEFT, border=10)
 
         CTRL_FRAME = wx.BoxSizer(wx.HORIZONTAL)
@@ -108,6 +135,8 @@ class MyFrame(wx.Frame):
         CTRL_FRAME.Add(self.analysis_button, 0, wx.LEFT, border=15)
         CTRL_FRAME.Add(self.rename_button, 0, wx.LEFT, border=15)
 
+        WINDOW = wx.BoxSizer(wx.VERTICAL)
+        WINDOW.Add(self.list_ctrl, 0, wx.ALIGN_CENTER | wx.TOP | wx.BOTTOM, border=15)
         WINDOW.Add(EDIT_FRAME, 0, wx.ALIGN_CENTER)
         WINDOW.Add(CTRL_FRAME, 0, wx.TOP | wx.LEFT, border=15)
 
@@ -155,7 +184,7 @@ class MyFrame(wx.Frame):
                     self.list_ctrl.SetItem(list_id, 2, b_originate_name)
                 else:
                     print("该动画未获取到内容，已跳过")
-                
+
                 # 进入下一轮前修改 ID
                 list_id += 1
 
@@ -187,7 +216,7 @@ class DropFolder(wx.FileDropTarget):
                     print(f"{file_name}已存在")
             else:
                 print(f"已过滤文件{file_path}")
- 
+
                 # 调整第一列宽度以适应内容
                 # width, height = self.window.GetTextExtent(file_name)
                 # width = width + 20
