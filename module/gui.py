@@ -54,7 +54,6 @@ class MyFrame(wx.Frame):
 
         # 标签
         label_width = win_width - 295
-        print(label_width)
         self.lbt_file_name = wx.StaticText(self, label="文件名", style=wx.ALIGN_LEFT)
         self.lbt_file_name.SetMinSize((60, -1))
         self.lb_file_name = wx.StaticText(self, label="[Moozzi2] Tensei Oujo to Tensai Reijou no Mahou Kakumei BD-BOX [ x265-10Bit Ver. ] - TV + SP", style=wx.ALIGN_LEFT)
