@@ -1,6 +1,5 @@
 import wx
 import os
-import re
 import ctypes  # 高分屏适配
 import asyncio  # 异步IO
 
@@ -41,7 +40,7 @@ class MyFrame(wx.Frame):
         self.list_ctrl.SetDropTarget(DropFolder(self.list_ctrl, self.file_path_exist))
         
         # 标签容器
-        self.edit_frame = wx.StaticBox(self, label="编辑关联条目", size=(rule_width,0))
+        self.edit_frame = wx.StaticBox(self, label="编辑关联条目", size=(rule_width, 0))
 
         # 图片
         img_url = "img/default.jpg"
