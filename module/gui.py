@@ -40,7 +40,7 @@ class MyFrame(wx.Frame):
         self.list_ctrl.SetDropTarget(DropFolder(self.list_ctrl, self.file_path_exist))
 
         # 标签容器
-        self.edit_frame = wx.StaticBox(self, label="查看动画详情", size=(rule_width, 0))
+        self.edit_frame = wx.StaticBox(self, label="编辑关联条目", size=(rule_width, 0))
 
         # 图片
         img_url = "img/default.jpg"
@@ -98,12 +98,12 @@ class MyFrame(wx.Frame):
         # 清除按钮
         self.clear_button = wx.Button(self, label="清除全部")
         self.clear_button.SetMinSize((100, 32))
-        self.clear_button.Bind(wx.EVT_BUTTON, self.on_clear_list)
+        self.clear_button.Bind(wx.EVT_BUTTON, function.on_clear_list)
 
         # 识别按钮
         self.analysis_button = wx.Button(self, label="开始识别")
         self.analysis_button.SetMinSize((100, 32))
-        self.analysis_button.Bind(wx.EVT_BUTTON, self.start_analysis)
+        self.analysis_button.Bind(wx.EVT_BUTTON, function.start_analysis)
 
         # 重命名按钮
         self.rename_button = wx.Button(self, label="重命名全部")
@@ -117,7 +117,7 @@ class MyFrame(wx.Frame):
         LABEL_FRAME = wx.BoxSizer(wx.VERTICAL)
         LABEL_FRAME.Add(self.lb_file_name, 0, wx.TOP | wx.BOTTOM, border=5)
         LABEL_FRAME.Add(self.lb_file_path, 0, wx.TOP | wx.BOTTOM, border=5)
-        LABEL_FRAME.Add(self.label_line1, 0, wx.EXPAND | wx.TOP | wx.BOTTOM, border=10)
+        LABEL_FRAME.Add(self.label_line1, 0, wx.EXPAND | wx.TOP | wx.BOTTOM , border=10)
         # LABEL_FRAME.Add(self.lb_b_originate_name, 0, wx.TOP | wx.BOTTOM, border=5)
         LABEL_FRAME.Add(self.lb_b_cn_name, 0, wx.TOP | wx.BOTTOM, border=5)
         LABEL_FRAME.Add(self.lb_b_jp_name, 0, wx.TOP | wx.BOTTOM, border=5)
@@ -149,50 +149,6 @@ class MyFrame(wx.Frame):
         file_name = self.list_ctrl.GetItemText(selected_item.GetId(), 0)
         print(f"当前选择文件夹: {file_name}")
 
-    def start_analysis(self, event):
-        # 调用获取到的文件路径列表
-        file_path_exist = self.list_ctrl.GetDropTarget().file_path_exist
-
-        # 判断列表是否为空
-        if file_path_exist == set():
-            print("请先拖入文件夹")
-            # 禁用按钮
-            # self.analysis_button.Enable(False)
-        else:
-            # 创建列表，写入所有抓取的数据
-            anime_list = []
-
-            # 循环开始：分析每个文件
-            list_id = 0
-            for file_path in file_path_exist:
-
-                # 通过文件路径 file_path 获取数据，合并入列表 anime_list
-                this_anime_dict = function.get_anime_info(list_id, file_path)
-                anime_list.append(this_anime_dict)
-                print(anime_list)
-
-                # 写入listview
-                # 如果没有 b_originate_name 说明没有执行到最后一步
-                # 重写 file_file 并展示在 listview 避免错位
-                this_anime = anime_list[list_id]
-                if "b_originate_name" in this_anime:
-                    file_name = anime_list[list_id]["file_name"]
-                    b_cn_name = anime_list[list_id]["b_cn_name"]
-                    b_originate_name = anime_list[list_id]["b_originate_name"]
-                    self.list_ctrl.SetItem(list_id, 0, file_name)
-                    self.list_ctrl.SetItem(list_id, 1, b_cn_name)
-                    self.list_ctrl.SetItem(list_id, 2, b_originate_name)
-                else:
-                    print("该动画未获取到内容，已跳过")
-
-                # 进入下一轮前修改 ID
-                list_id += 1
-
-    def on_clear_list(self, event):
-        self.list_ctrl.DeleteAllItems()
-        self.file_path_exist = []
-        print("已清除所有文件夹")
-
 
 class DropFolder(wx.FileDropTarget):
     def __init__(self, window, file_path_exist):
@@ -211,6 +167,7 @@ class DropFolder(wx.FileDropTarget):
                     self.window.InsertItem(self.window.GetItemCount(), file_name)
                     self.file_path_exist.append(file_path)
                     print(f"新增了{file_name}")
+                    # print(f"总路径列表：{self.file_path_exist}")
                 else:
                     print(f"{file_name}已存在")
             else:
