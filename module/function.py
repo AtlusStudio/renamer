@@ -98,32 +98,6 @@ def get_anime_info(list_id, path):
     print(f"搜索完成，该动画第一季为{prev_name}")
     this_anime_dict["b_originate_name"] = prev_name
 
-
-    
-
-
-
-
-
-
-    # # 如果获得的 b_sid 与 b_id 不同，说明之前还有前传，则继续执行
-    # while b_temp_id != b_id:
-    #     print("当前轮次似乎有前传，正在获取前传ID")
-    #     bangumi_previous_result = api.bangumi_previous(b_temp_id, b_cn_name)
-    #     b_sid = str(bangumi_sid_result[0])
-    #     print(b_sid)
-    # else:
-    #     print("ok")
-
-    # print("该动画无前传")
-
-
-
-
-
-
-
-
     return this_anime_dict
 
 

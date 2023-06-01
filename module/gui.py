@@ -40,7 +40,7 @@ class MyFrame(wx.Frame):
         self.list_ctrl.SetDropTarget(DropFolder(self.list_ctrl, self.file_path_exist))
 
         # 标签容器
-        self.edit_frame = wx.StaticBox(self, label="编辑关联条目", size=(rule_width, 0))
+        self.edit_frame = wx.StaticBox(self, label="查看动画详情", size=(rule_width, 0))
 
         # 图片
         img_url = "img/default.jpg"
@@ -117,7 +117,7 @@ class MyFrame(wx.Frame):
         LABEL_FRAME = wx.BoxSizer(wx.VERTICAL)
         LABEL_FRAME.Add(self.lb_file_name, 0, wx.TOP | wx.BOTTOM, border=5)
         LABEL_FRAME.Add(self.lb_file_path, 0, wx.TOP | wx.BOTTOM, border=5)
-        LABEL_FRAME.Add(self.label_line1, 0, wx.EXPAND | wx.TOP | wx.BOTTOM , border=10)
+        LABEL_FRAME.Add(self.label_line1, 0, wx.EXPAND | wx.TOP | wx.BOTTOM, border=10)
         # LABEL_FRAME.Add(self.lb_b_originate_name, 0, wx.TOP | wx.BOTTOM, border=5)
         LABEL_FRAME.Add(self.lb_b_cn_name, 0, wx.TOP | wx.BOTTOM, border=5)
         LABEL_FRAME.Add(self.lb_b_jp_name, 0, wx.TOP | wx.BOTTOM, border=5)
@@ -211,7 +211,6 @@ class DropFolder(wx.FileDropTarget):
                     self.window.InsertItem(self.window.GetItemCount(), file_name)
                     self.file_path_exist.append(file_path)
                     print(f"新增了{file_name}")
-                    # print(f"总路径列表：{self.file_path_exist}")
                 else:
                     print(f"{file_name}已存在")
             else:
