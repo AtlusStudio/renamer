@@ -1,7 +1,6 @@
 import wx
 import os
 import ctypes  # 高分屏适配
-import asyncio  # 异步IO
 
 from module import function
 
@@ -17,11 +16,8 @@ class MyFrame(wx.Frame):
         self.Center()
         self.SetBackgroundColour(wx.Colour(245, 245, 245))
 
-        # 创建列表而非集合，方便排序
+        # 创建列表储存所有路径
         self.file_path_exist = []
-
-        # 创建列表，写入所有抓取的数据
-        self.anime_list = []
 
         # 修正窗口实际宽度
         win_width, win_height = self.GetClientSize()
@@ -57,39 +53,25 @@ class MyFrame(wx.Frame):
         # 标签
         label_width = win_width - 230
 
-        b_jp_name = ""
-        lbl_b_jp_name = f"动画:{b_jp_name}"
-        self.lb_b_jp_name = wx.StaticText(self, label=lbl_b_jp_name, style=wx.ALIGN_LEFT)
+        self.lb_b_jp_name = wx.StaticText(self, label="动画:", style=wx.ALIGN_LEFT)
         self.lb_b_jp_name.SetMinSize((label_width, -1))
 
-        b_cn_name = ""
-        lbl_b_cn_name = f"中文名:{b_cn_name}"
-        self.lb_b_cn_name = wx.StaticText(self, label=lbl_b_cn_name, style=wx.ALIGN_LEFT)
+        self.lb_b_cn_name = wx.StaticText(self, label="中文名:", style=wx.ALIGN_LEFT)
         self.lb_b_cn_name.SetMinSize((label_width, -1))
 
-        b_originate_name = ""
-        lbl_b_originate_name = f"动画系列:{b_originate_name}"
-        self.lb_b_originate_name = wx.StaticText(self, label=lbl_b_originate_name, style=wx.ALIGN_LEFT)
+        self.lb_b_originate_name = wx.StaticText(self, label="动画系列:", style=wx.ALIGN_LEFT)
         self.lb_b_originate_name.SetMinSize((label_width, -1))
 
-        a_type = ""
-        lbl_a_type = f"动画类型:{a_type}"
-        self.lb_a_type = wx.StaticText(self, label=lbl_a_type, style=wx.ALIGN_LEFT)
+        self.lb_a_type = wx.StaticText(self, label="动画类型:", style=wx.ALIGN_LEFT)
         self.lb_a_type.SetMinSize((label_width, -1))
 
-        b_date = ""
-        lbl_b_date = f"放送日期:{b_date}"
-        self.lb_b_date = wx.StaticText(self, label=lbl_b_date, style=wx.ALIGN_LEFT)
+        self.lb_b_date = wx.StaticText(self, label="放送日期:", style=wx.ALIGN_LEFT)
         self.lb_b_date.SetMinSize((label_width, -1))
 
-        file_name = ""
-        lbl_file_name = f"文件名：{file_name}"
-        self.lb_file_name = wx.StaticText(self, label=lbl_file_name, style=wx.ALIGN_LEFT)
+        self.lb_file_name = wx.StaticText(self, label="文件名:", style=wx.ALIGN_LEFT)
         self.lb_file_name.SetMinSize((label_width, -1))
 
-        final_rename = ""
-        lbl_final_rename = f"重命名结果:{final_rename}"
-        self.lbl_final_rename = wx.StaticText(self, label=lbl_final_rename, style=wx.ALIGN_LEFT)
+        self.lbl_final_rename = wx.StaticText(self, label="重命名结果:", style=wx.ALIGN_LEFT)
         self.lbl_final_rename.SetMinSize((label_width, -1))
 
         # 进度条
@@ -146,12 +128,45 @@ class MyFrame(wx.Frame):
     def list_selected(self, event):
         # 获取选择的行数等同于 ID
         list_id = self.list_ctrl.GetFirstSelected()
-        print(self.anime_list)
-        b_jp_name = self.anime_list[0]["b_jp_name"]
-        print(f"当前选择ID: {list_id}")
-        print(f"当前选择的文件夹: {b_jp_name}")
+        list_count = len(self.anime_list)
+        list_count = list_count - 1
+
+        # 选中的行是否已经分析过并写入列表
+        if list_id <= list_count:
+            b_jp_name = self.anime_list[list_id]["b_jp_name"]
+            self.lb_b_jp_name.SetLabel(f"动画: {b_jp_name}")
+
+            b_cn_name = self.anime_list[list_id]["b_cn_name"]
+            self.lb_b_cn_name.SetLabel(f"中文名: {b_cn_name}")
+
+            b_originate_name = self.anime_list[list_id]["b_originate_name"]
+            self.lb_b_originate_name.SetLabel(f"动画系列: {b_originate_name}")
+
+            a_type = self.anime_list[list_id]["a_type"]
+            self.lb_a_type.SetLabel(f"动画类型: {a_type}")
+
+            # b_date = self.anime_list[list_id]["b_date"]
+            # self.lb_b_date.SetLabel(f"放送日期: {b_date}")
+
+            file_name = self.anime_list[list_id]["file_name"]
+            self.lb_file_name.SetLabel(f"文件名: {file_name}")
+
+            final_rename = self.anime_list[list_id]["b_originate_name"]
+            self.lbl_final_rename.SetLabel(f"重命名结果: {final_rename}/{final_rename}")
+
+        else:
+            self.lb_b_jp_name.SetLabel("动画:")
+            self.lb_b_cn_name.SetLabel("中文名:")
+            self.lb_b_originate_name.SetLabel("动画系列:")
+            self.lb_a_type.SetLabel("动画类型:")
+            # self.lb_b_date.SetLabel(f"放送日期: {b_date}")
+            self.lb_file_name.SetLabel("文件名:")
+            self.lbl_final_rename.SetLabel("重命名结果:")
 
     def start_analysis(self, event):
+        # 创建列表，写入所有抓取的数据
+        self.anime_list = []
+
         # 调用获取到的文件路径列表
         file_path_exist = self.list_ctrl.GetDropTarget().file_path_exist
 

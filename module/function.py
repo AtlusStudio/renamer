@@ -121,6 +121,17 @@ def get_anime_info(list_id, path):
     return this_anime_dict
 
 
+# 展示指定 ID 的详细信息
+# def show_anime_detail(list_id):
+#
+#
+#
+#     b_jp_name = self.anime_list[list_id]["b_jp_name"]
+
+
+
+
+
 #
 #
 # file_name = "[Moozzi2] Watashi ni Tenshi ga Maiorita! Precious Friends [ x265-10Bit Ver. ] - Movie + SP"
