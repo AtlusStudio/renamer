@@ -41,8 +41,8 @@ class MyFrame(wx.Frame):
         # 标签容器
         self.edit_frame = wx.StaticBox(self, label="详细信息", size=(rule_width, 0))
 
-        img_url = "img/default.jpg"
-        self.image = wx.Image(img_url, wx.BITMAP_TYPE_ANY)
+        # 图片
+        self.image = wx.Image("img/default.jpg", wx.BITMAP_TYPE_ANY)
         self.scaled = self.image.Scale(142, 205, wx.IMAGE_QUALITY_HIGH)
         self.bitmap = wx.StaticBitmap(self, wx.ID_ANY, wx.Bitmap(self.scaled))
 
@@ -153,6 +153,14 @@ class MyFrame(wx.Frame):
 
             final_rename = self.anime_list[list_id]["b_originate_name"]
             self.lbl_final_rename.SetLabel(f"重命名结果: {final_rename}/{final_rename}")
+
+            b_image_path = self.anime_list[list_id]["b_image"]
+            b_image_name = os.path.basename(b_image_path)
+
+            self.image = wx.Image(f"img/{b_image_name}", wx.BITMAP_TYPE_ANY)
+            self.scaled = self.image.Scale(142, 205, wx.IMAGE_QUALITY_HIGH)
+            self.bitmap.SetBitmap(wx.Bitmap(self.scaled))
+
 
         else:
             self.lb_b_jp_name.SetLabel("动画:")
