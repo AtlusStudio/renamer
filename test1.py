@@ -1,38 +1,26 @@
 import wx
-import ssl
-import urllib.request
-
 
 class MyFrame(wx.Frame):
-    def __init__(self, parent):
-        wx.Frame.__init__(self, parent, title="插入网络图片", size=(400, 300))
-        panel = wx.Panel(self)
+    def __init__(self):
+        wx.Frame.__init__(self, None, wx.ID_ANY, "ListCtrl Example", size=(400, 300))
 
-        ssl._create_default_https_context = ssl._create_unverified_context
+        panel = wx.Panel(self, wx.ID_ANY)
+        self.list_ctrl = wx.ListCtrl(panel, wx.ID_ANY, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
 
-        # 网络图片的URL
-        image_url = "https://lain.bgm.tv/pic/cover/l/21/a1/292238_u43yn.jpg"
+        self.list_ctrl.InsertColumn(0, "Name")
+        self.list_ctrl.InsertColumn(1, "Age")
+        self.list_ctrl.InsertItem(0, "John Doe")
+        self.list_ctrl.SetItem(0, 1, "25")
+        self.list_ctrl.InsertItem(1, "Jane Smith")
+        self.list_ctrl.SetItem(1, 1, "30")
 
-        # 下载图片并创建wx.Image对象
-        image_data = urllib.request.urlopen(image_url).read()
-        image = wx.Image(1, 1)  # 创建一个空的wx.Image对象
-        image.LoadFile(wx.InputStream(image_data))
+        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_item_selected, self.list_ctrl)
 
-        # 调整图片大小
-        image.Rescale(200, 200)
-
-        # 创建wx.Bitmap对象
-        bitmap = wx.Bitmap(image)
-
-        # 创建显示图片的静态位图控件
-        bitmap_ctrl = wx.StaticBitmap(panel, bitmap=bitmap)
-
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(bitmap_ctrl, 0, wx.ALL, 10)
-        panel.SetSizerAndFit(sizer)
-
+    def on_item_selected(self, event):
+        selected_index = self.list_ctrl.GetFirstSelected()
+        print("Selected Row: ", selected_index)
 
 app = wx.App()
-frame = MyFrame(None)
+frame = MyFrame()
 frame.Show()
 app.MainLoop()

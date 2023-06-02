@@ -20,6 +20,9 @@ class MyFrame(wx.Frame):
         # 创建列表而非集合，方便排序
         self.file_path_exist = []
 
+        # 创建列表，写入所有抓取的数据
+        self.anime_list = []
+
         # 修正窗口实际宽度
         win_width, win_height = self.GetClientSize()
         rule_width = win_width - 30
@@ -141,10 +144,12 @@ class MyFrame(wx.Frame):
         print("窗口创建完成，实际宽度" + str(rule_width) + "像素")
 
     def list_selected(self, event):
-        # 选择文件夹时输出当前选择的文件名
-        selected_item = event.GetItem()
-        file_name = self.list_ctrl.GetItemText(selected_item.GetId(), 0)
-        print(f"当前选择文件夹: {file_name}")
+        # 获取选择的行数等同于 ID
+        list_id = self.list_ctrl.GetFirstSelected()
+        print(self.anime_list)
+        b_jp_name = self.anime_list[0]["b_jp_name"]
+        print(f"当前选择ID: {list_id}")
+        print(f"当前选择的文件夹: {b_jp_name}")
 
     def start_analysis(self, event):
         # 调用获取到的文件路径列表
@@ -156,26 +161,23 @@ class MyFrame(wx.Frame):
             # 禁用按钮
             # self.analysis_button.Enable(False)
         else:
-            # 创建列表，写入所有抓取的数据
-            anime_list = []
-
             # 循环开始：分析每个文件
             list_id = 0
             for file_path in file_path_exist:
 
                 # 通过文件路径 file_path 获取数据，合并入列表 anime_list
                 this_anime_dict = function.get_anime_info(list_id, file_path)
-                anime_list.append(this_anime_dict)
-                print(anime_list)
+                self.anime_list.append(this_anime_dict)
+                print(self.anime_list)
 
                 # 写入listview
                 # 如果没有 b_originate_name 说明没有执行到最后一步
                 # 重写 file_file 并展示在 listview 避免错位
-                this_anime = anime_list[list_id]
+                this_anime = self.anime_list[list_id]
                 if "b_originate_name" in this_anime:
-                    file_name = anime_list[list_id]["file_name"]
-                    b_cn_name = anime_list[list_id]["b_cn_name"]
-                    b_originate_name = anime_list[list_id]["b_originate_name"]
+                    file_name = self.anime_list[list_id]["file_name"]
+                    b_cn_name = self.anime_list[list_id]["b_cn_name"]
+                    b_originate_name = self.anime_list[list_id]["b_originate_name"]
                     self.list_ctrl.SetItem(list_id, 0, file_name)
                     self.list_ctrl.SetItem(list_id, 1, b_cn_name)
                     self.list_ctrl.SetItem(list_id, 2, b_originate_name)
