@@ -1,28 +1,38 @@
 import wx
-import sys
+import ssl
+import urllib.request
+
 
 class MyFrame(wx.Frame):
-    def __init__(self):
-        super().__init__(parent=None, title='Print to StatusBar Example')
-        self.panel = wx.Panel(self)
-        self.status_bar = self.CreateStatusBar()
+    def __init__(self, parent):
+        wx.Frame.__init__(self, parent, title="插入网络图片", size=(400, 300))
+        panel = wx.Panel(self)
 
-        # 重定向输出到状态栏
-        sys.stdout = StatusBarPrint(self.status_bar)
+        ssl._create_default_https_context = ssl._create_unverified_context
 
-        # 测试输出
-        print("Hello, World!")
+        # 网络图片的URL
+        image_url = "https://lain.bgm.tv/pic/cover/l/21/a1/292238_u43yn.jpg"
 
-        self.Show()
+        # 下载图片并创建wx.Image对象
+        image_data = urllib.request.urlopen(image_url).read()
+        image = wx.Image(1, 1)  # 创建一个空的wx.Image对象
+        image.LoadFile(wx.InputStream(image_data))
 
-class StatusBarPrint:
-    def __init__(self, status_bar):
-        self.status_bar = status_bar
+        # 调整图片大小
+        image.Rescale(200, 200)
 
-    def write(self, text):
-        self.status_bar.SetStatusText(text.strip())
+        # 创建wx.Bitmap对象
+        bitmap = wx.Bitmap(image)
 
-if __name__ == '__main__':
-    app = wx.App()
-    frame = MyFrame()
-    app.MainLoop()
+        # 创建显示图片的静态位图控件
+        bitmap_ctrl = wx.StaticBitmap(panel, bitmap=bitmap)
+
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(bitmap_ctrl, 0, wx.ALL, 10)
+        panel.SetSizerAndFit(sizer)
+
+
+app = wx.App()
+frame = MyFrame(None)
+frame.Show()
+app.MainLoop()

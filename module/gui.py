@@ -40,12 +40,11 @@ class MyFrame(wx.Frame):
         self.list_ctrl.SetDropTarget(DropFolder(self.list_ctrl, self.file_path_exist))
 
         # 标签容器
-        self.edit_frame = wx.StaticBox(self, label="查看动画详情", size=(rule_width, 0))
+        self.edit_frame = wx.StaticBox(self, label="详细信息", size=(rule_width, 0))
 
-        # 图片
         img_url = "img/default.jpg"
         self.image = wx.Image(img_url, wx.BITMAP_TYPE_ANY)
-        self.scaled = self.image.Scale(145, 210, wx.IMAGE_QUALITY_HIGH)
+        self.scaled = self.image.Scale(142, 205, wx.IMAGE_QUALITY_HIGH)
         self.bitmap = wx.StaticBitmap(self, wx.ID_ANY, wx.Bitmap(self.scaled))
 
         # 分割线
@@ -55,35 +54,35 @@ class MyFrame(wx.Frame):
         # 标签
         label_width = win_width - 230
 
+        b_jp_name = ""
+        lbl_b_jp_name = f"动画:{b_jp_name}"
+        self.lb_b_jp_name = wx.StaticText(self, label=lbl_b_jp_name, style=wx.ALIGN_LEFT)
+        self.lb_b_jp_name.SetMinSize((label_width, -1))
+
+        b_cn_name = ""
+        lbl_b_cn_name = f"中文名:{b_cn_name}"
+        self.lb_b_cn_name = wx.StaticText(self, label=lbl_b_cn_name, style=wx.ALIGN_LEFT)
+        self.lb_b_cn_name.SetMinSize((label_width, -1))
+
+        b_originate_name = ""
+        lbl_b_originate_name = f"动画系列:{b_originate_name}"
+        self.lb_b_originate_name = wx.StaticText(self, label=lbl_b_originate_name, style=wx.ALIGN_LEFT)
+        self.lb_b_originate_name.SetMinSize((label_width, -1))
+
+        a_type = ""
+        lbl_a_type = f"动画类型:{a_type}"
+        self.lb_a_type = wx.StaticText(self, label=lbl_a_type, style=wx.ALIGN_LEFT)
+        self.lb_a_type.SetMinSize((label_width, -1))
+
+        b_date = ""
+        lbl_b_date = f"放送日期:{b_date}"
+        self.lb_b_date = wx.StaticText(self, label=lbl_b_date, style=wx.ALIGN_LEFT)
+        self.lb_b_date.SetMinSize((label_width, -1))
+
         file_name = ""
         lbl_file_name = f"文件名：{file_name}"
         self.lb_file_name = wx.StaticText(self, label=lbl_file_name, style=wx.ALIGN_LEFT)
         self.lb_file_name.SetMinSize((label_width, -1))
-
-        file_path = ""
-        lbl_file_path = f"文件路径:{file_path}"
-        self.lb_file_path = wx.StaticText(self, label=lbl_file_path, style=wx.ALIGN_LEFT)
-        self.lb_file_path.SetMinSize((label_width, -1))
-
-        # b_originate_name = ""
-        # lbl_b_originate_name = f"动画名(首季):{b_originate_name}"
-        # self.lb_b_originate_name = wx.StaticText(self, label=lbl_b_originate_name, style=wx.ALIGN_LEFT)
-        # self.lb_b_originate_name.SetMinSize((label_width, -1))
-
-        b_cn_name = ""
-        lbl_b_cn_name = f"动画名(中文):{b_cn_name}"
-        self.lb_b_cn_name = wx.StaticText(self, label=lbl_b_cn_name, style=wx.ALIGN_LEFT)
-        self.lb_b_cn_name.SetMinSize((label_width, -1))
-
-        b_jp_name = ""
-        lbl_b_jp_name = f"动画名(日文):{b_jp_name}"
-        self.lb_b_jp_name = wx.StaticText(self, label=lbl_b_jp_name, style=wx.ALIGN_LEFT)
-        self.lb_b_jp_name.SetMinSize((label_width, -1))
-
-        b_date = ""
-        lbl_b_date = f"首播日期:{b_date}"
-        self.lb_b_date = wx.StaticText(self, label=lbl_b_date, style=wx.ALIGN_LEFT)
-        self.lb_b_date.SetMinSize((label_width, -1))
 
         final_rename = ""
         lbl_final_rename = f"重命名结果:{final_rename}"
@@ -115,15 +114,13 @@ class MyFrame(wx.Frame):
 
         # 排列窗口
         LABEL_FRAME = wx.BoxSizer(wx.VERTICAL)
-        LABEL_FRAME.Add(self.lb_file_name, 0, wx.TOP | wx.BOTTOM, border=5)
-        LABEL_FRAME.Add(self.lb_file_path, 0, wx.TOP | wx.BOTTOM, border=5)
-        LABEL_FRAME.Add(self.label_line1, 0, wx.EXPAND | wx.TOP | wx.BOTTOM, border=10)
-        # LABEL_FRAME.Add(self.lb_b_originate_name, 0, wx.TOP | wx.BOTTOM, border=5)
-        LABEL_FRAME.Add(self.lb_b_cn_name, 0, wx.TOP | wx.BOTTOM, border=5)
         LABEL_FRAME.Add(self.lb_b_jp_name, 0, wx.TOP | wx.BOTTOM, border=5)
+        LABEL_FRAME.Add(self.lb_b_cn_name, 0, wx.TOP | wx.BOTTOM, border=5)
+        LABEL_FRAME.Add(self.lb_b_originate_name, 0, wx.TOP | wx.BOTTOM, border=5)
+        LABEL_FRAME.Add(self.lb_a_type, 0, wx.TOP | wx.BOTTOM, border=5)
         LABEL_FRAME.Add(self.lb_b_date, 0, wx.TOP | wx.BOTTOM, border=5)
-        LABEL_FRAME.Add(self.label_line2, 0, wx.EXPAND | wx.TOP | wx.BOTTOM, border=10)
-        LABEL_FRAME.Add(self.lbl_final_rename, 0, wx.TOP | wx.BOTTOM, border=5)
+        LABEL_FRAME.Add(self.lb_file_name, 0, wx.TOP, border=25)
+        LABEL_FRAME.Add(self.lbl_final_rename, 0, wx.TOP, border=10)
 
         EDIT_FRAME = wx.StaticBoxSizer(self.edit_frame, wx.HORIZONTAL)
         EDIT_FRAME.Add(self.bitmap, 0, wx.ALL, border=10)
