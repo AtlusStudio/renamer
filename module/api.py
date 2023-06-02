@@ -18,7 +18,6 @@ def anilist(name):
                 native
             }
             format
-            startDate
         }
     }'''
 
@@ -159,7 +158,7 @@ def bangumi_search(name):
     print(f"在Bangumi中搜索{name}失败")
 
 
-# 向 Bangumi Previous 请求数据(search/subject/keywords)
+# 向 Bangumi Previous 请求数据(v0/subjects/subjects)
 # https://bangumi.github.io/api/
 def bangumi_previous(b_id, cn_name):
     headers = {
@@ -216,8 +215,8 @@ def set_format(type):
 
 
 
-idd = str(371546)
-
-
-result = anilist("Drifting Home")
-print(result)
+# idd = str(371546)
+#
+#
+# result = anilist("Drifting Home")
+# print(result)

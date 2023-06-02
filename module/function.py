@@ -99,6 +99,12 @@ def get_anime_info(list_id, path):
     print(f"搜索完成，该动画第一季为{prev_name}")
     this_anime_dict["b_originate_name"] = prev_name
 
+    # 向 Bangumi ID 请求数据
+    # b_date = bangumi_prev_result[2]
+    # b_type = bangumi_prev_result[3]
+    # this_anime_dict["b_date"] = b_date
+    # this_anime_dict["b_type"] = b_type
+
     # 下载下来图片并写入字典
     # 如果路径不存在则创建路径
     img_dir = "img"
