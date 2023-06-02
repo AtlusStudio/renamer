@@ -18,6 +18,7 @@ def anilist(name):
                 native
             }
             format
+            startDate
         }
     }'''
 
@@ -38,18 +39,10 @@ def anilist(name):
             print(f"成功获取到{name}的Anilist数据")
 
             a_jp_name = result["data"]["Media"]["title"]["native"]
-            a_type = result["data"]["Media"]["format"].lower()
+            a_type = result["data"]["Media"]["format"]
 
             # 格式化动画类型 a_type
-            if a_type in ["tv", "tv_short"]:
-                a_type = "1.TV"
-            elif a_type in ["movie"]:
-                a_type = "2.MOVIE"
-            elif a_type in ["special", "ova", "ona"]:
-                a_type = "3.SP"
-            else:
-                a_type = "XBD"
-                print("未知的动画类型，注意检查")
+            a_type = set_format(a_type)
 
             # 将上述元素放入字典
             a_dict = dict()
@@ -208,19 +201,23 @@ def bangumi_previous(b_id, cn_name):
     print(f"在Bangumi中请求ID {b_id}数据失败")
 
 
+# 格式化动画类型 a_type
+def set_format(type):
+    if type in ["TV", "TV_SHORT"]:
+        a_type = "1.TV"
+    elif type in ["MOVIE"]:
+        a_type = "2.MOVIE"
+    elif type in ["SPECIAL", "OVA", "ONA"]:
+        a_type = "3.SP"
+    else:
+        a_type = "XBD"
+        print("未知的动画类型，注意检查")
+    return a_type
 
 
 
-
-# idd = str(371546)
-# name = "输入是啥就是啥"
-
-# bangumi_b_id_result = bangumi_previous(idd, name)
-# b_b_id = bangumi_b_id_result[1]
-# print(bangumi_b_id_result)
+idd = str(371546)
 
 
-
-
-
-
+result = anilist("Drifting Home")
+print(result)
