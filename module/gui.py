@@ -104,7 +104,7 @@ class MyFrame(wx.Frame):
         LABEL_FRAME.Add(self.lb_b_originate_name, 0, wx.TOP | wx.BOTTOM, border=5)
         LABEL_FRAME.Add(self.lb_a_type, 0, wx.TOP | wx.BOTTOM, border=5)
         LABEL_FRAME.Add(self.lb_b_date, 0, wx.TOP | wx.BOTTOM, border=5)
-        LABEL_FRAME.Add(self.lb_file_name, 0, wx.TOP, border=25)
+        LABEL_FRAME.Add(self.lb_file_name, 0, wx.TOP, border=15)
         LABEL_FRAME.Add(self.lbl_final_rename, 0, wx.TOP, border=10)
 
         EDIT_FRAME = wx.StaticBoxSizer(self.edit_frame, wx.HORIZONTAL)
