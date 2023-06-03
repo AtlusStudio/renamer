@@ -1,39 +1,47 @@
-import sys
-from PyQt6.QtWidgets import QApplication, QMainWindow, QTreeWidget, QTreeWidgetItem
-from PyQt6.QtCore import Qt, QMimeData
-from PyQt6.QtGui import QDropEvent
+from PySide6.QtCore import Qt, QModelIndex
+from PySide6.QtGui import QStandardItemModel, QStandardItem
+from PySide6.QtWidgets import QApplication, QTreeView, QStyledItemDelegate
 
+class CheckBoxDelegate(QStyledItemDelegate):
+    def __init__(self, parent=None):
+        super().__init__(parent)
 
-class MainWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
+    def paint(self, painter, option, index):
+        value = index.data(Qt.CheckStateRole)
+        if value == Qt.Checked:
+            checkbox_state = Qt.Checked
+        else:
+            checkbox_state = Qt.Unchecked
 
-        self.tree_widget = QTreeWidget(self)
-        self.tree_widget.setHeaderLabels(['序号', '文件夹名称'])
-        self.tree_widget.setDragEnabled(True)
-        self.tree_widget.setAcceptDrops(True)
-        self.tree_widget.viewport().setAcceptDrops(True)
-        self.tree_widget.setDropIndicatorShown(True)
-        self.setCentralWidget(self.tree_widget)
+        style = QApplication.style()
+        style.drawControl(QApplication.style().CE_CheckBox, option, painter)
+        checkbox_rect = style.subElementRect(QApplication.style().SE_CheckBoxContents, option)
+        checkbox_rect.moveCenter(option.rect.center())
+        painter.drawControl(QApplication.style().CE_CheckBox, option)
 
-    def dragEnterEvent(self, event):
-        if event.mimeData().hasUrls():
-            event.acceptProposedAction()
-
-    def dropEvent(self, event: QDropEvent):
-        mime_data = event.mimeData()
-        if mime_data.hasUrls():
-            urls = mime_data.urls()
-            for url in urls:
-                path = url.toLocalFile()
-                folder_name = QTreeWidgetItem([str(self.tree_widget.topLevelItemCount()), path])
-                self.tree_widget.addTopLevelItem(folder_name)
-
-            event.acceptProposedAction()
-
+    def editorEvent(self, event, model, option, index):
+        if event.type() == event.MouseButtonRelease:
+            model.setData(index, not index.data(Qt.CheckStateRole), Qt.CheckStateRole)
+            return True
+        return super().editorEvent(event, model, option, index)
 
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    window = MainWindow()
-    window.show()
-    sys.exit(app.exec())
+    app = QApplication([])
+
+    model = QStandardItemModel()
+    model.setHorizontalHeaderLabels(['Items'])
+
+    tree_view = QTreeView()
+    tree_view.setModel(model)
+    tree_view.setItemDelegateForColumn(0, CheckBoxDelegate())
+
+    # 添加示例数据
+    for i in range(5):
+        item = QStandardItem(f'Item {i+1}')
+        item.setCheckable(True)
+        item.setCheckState(Qt.Unchecked)
+        model.appendRow(item)
+
+    tree_view.show()
+
+    app.exec()

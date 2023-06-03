@@ -1,8 +1,10 @@
 import wx
-from PyQt6.QtWidgets import QApplication, QMainWindow
+import sys
+
+from PySide6 import QtGui, QtWidgets
 
 from module import gui
-from module.app import Ui_MainWindow
+from module import ap
 
 
 # if __name__ == "__main__":
@@ -12,21 +14,8 @@ from module.app import Ui_MainWindow
 #     app.MainLoop()
 
 
-
-
-
-
-
-
-if __name__ == '__main__':
-    # 创建一个 QApplication 实例和一个 QMainWindow 实例
-    app = QApplication([])
-    window = QMainWindow()
-
-    # 实例化 UI 类，并将其设置为主窗口的内容
-    ui = Ui_MainWindow()
-    ui.setupUi(window)
-
-    # 显示主窗口并运行应用程序
+if __name__ == "__main__":
+    app = QtWidgets.QApplication([])
+    window = ap.MyWidget()
     window.show()
-    app.exec()
+    sys.exit(app.exec())

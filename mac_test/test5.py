@@ -109,4 +109,3 @@ class DropFolder(wx.FileDropTarget):
             else:
                 print(f"已过滤文件{file_path}")
         return True
-用中文说一下，上述代码，如何在start_analysis函数中获取被OnDropFiles函数修改后的file_path_exist变量值
