@@ -1,47 +1,84 @@
-from PySide6.QtCore import Qt, QModelIndex
-from PySide6.QtGui import QStandardItemModel, QStandardItem
-from PySide6.QtWidgets import QApplication, QTreeView, QStyledItemDelegate
+# wx实现了拖放显示内容的效果
+# 仅显示文件夹
 
-class CheckBoxDelegate(QStyledItemDelegate):
-    def __init__(self, parent=None):
-        super().__init__(parent)
+import wx
+import os
 
-    def paint(self, painter, option, index):
-        value = index.data(Qt.CheckStateRole)
-        if value == Qt.Checked:
-            checkbox_state = Qt.Checked
-        else:
-            checkbox_state = Qt.Unchecked
 
-        style = QApplication.style()
-        style.drawControl(QApplication.style().CE_CheckBox, option, painter)
-        checkbox_rect = style.subElementRect(QApplication.style().SE_CheckBoxContents, option)
-        checkbox_rect.moveCenter(option.rect.center())
-        painter.drawControl(QApplication.style().CE_CheckBox, option)
+class MyFrame(wx.Frame):
+    def __init__(self):
+        super().__init__(None, title="renamer", size=(1000, 600))
+        self.Center()
+        self.SetBackgroundColour(wx.Colour(240, 240, 240))
 
-    def editorEvent(self, event, model, option, index):
-        if event.type() == event.MouseButtonRelease:
-            model.setData(index, not index.data(Qt.CheckStateRole), Qt.CheckStateRole)
-            return True
-        return super().editorEvent(event, model, option, index)
+        # 创建 ListView 表格
+        list_styles = wx.LC_REPORT | wx.LC_SINGLE_SEL | wx.LC_EDIT_LABELS
+        self.list_ctrl = wx.ListView(self, style=list_styles)
+        self.list_ctrl.SetMaxSize((-1, 400))
+        self.list_ctrl.InsertColumn(0, "文件名")
+        self.list_ctrl.InsertColumn(1, "中文名")
+        self.list_ctrl.InsertColumn(2, "格式化名")
+        self.list_ctrl.SetColumnWidth(0, 260)
+        self.list_ctrl.SetColumnWidth(1, 280)
+        self.list_ctrl.SetColumnWidth(2, 390)
+        
+        self.list_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_item_selected)
+        
+        self.list_ctrl.Bind(wx.EVT_LIST_BEGIN_DRAG, self.on_begin_drag)
+        self.list_ctrl.Bind(wx.EVT_LIST_BEGIN_RDRAG, self.on_begin_drag)
+        
+        self.list_ctrl.SetDropTarget(FolderDropTarget(self.list_ctrl))
+        
+        self.clear_button = wx.Button(self, label="Clear List")
+        self.clear_button.Bind(wx.EVT_BUTTON, self.on_clear_list)
+        
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(self.list_ctrl, 1, wx.EXPAND | wx.TOP | wx.LEFT | wx.RIGHT, border=25)
+        sizer.Add(self.clear_button, 0, wx.ALIGN_CENTER)
+        self.SetSizer(sizer)
+    
+    def on_item_selected(self, event):
+        selected_item = event.GetItem()
+        folder_name = self.list_ctrl.GetItemText(selected_item.GetId(), 0)
+        print(f"Selected Folder: {folder_name}")
+    
+    def on_begin_drag(self, event):
+        selected_item = self.list_ctrl.GetFirstSelected()
+        folder_name = self.list_ctrl.GetItemText(selected_item, 0)
+        folder_path = os.path.join(os.getcwd(), folder_name)
+        
+        data = wx.FileDataObject()
+        data.AddFile(folder_path)
+        
+        drop_source = wx.DropSource(self.list_ctrl)
+        drop_source.SetData(data)
+        
+        drop_source.DoDragDrop()
+    
+    def on_clear_list(self, event):
+        self.list_ctrl.DeleteAllItems()
 
-if __name__ == '__main__':
-    app = QApplication([])
 
-    model = QStandardItemModel()
-    model.setHorizontalHeaderLabels(['Items'])
+class FolderDropTarget(wx.FileDropTarget):
+    def __init__(self, window):
+        super().__init__()
+        self.window = window
+        
+    def OnDropFiles(self, x, y, filenames):
+        for file_path in filenames:
+            if os.path.isdir(file_path):  # 仅处理文件夹
+                folder_name = os.path.basename(file_path)
+                index = self.window.InsertItem(self.window.GetItemCount(), folder_name)
+                
+                # 调整第一列宽度以适应内容
+                self.window.SetColumnWidth(0, wx.LIST_AUTOSIZE)
+        
+        return True
 
-    tree_view = QTreeView()
-    tree_view.setModel(model)
-    tree_view.setItemDelegateForColumn(0, CheckBoxDelegate())
 
-    # 添加示例数据
-    for i in range(5):
-        item = QStandardItem(f'Item {i+1}')
-        item.setCheckable(True)
-        item.setCheckState(Qt.Unchecked)
-        model.appendRow(item)
 
-    tree_view.show()
+app = wx.App()
+frame = MyFrame()
+frame.Show()
+app.MainLoop()
 
-    app.exec()
