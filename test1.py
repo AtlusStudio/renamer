@@ -1,26 +1,39 @@
-import wx
+import sys
+from PyQt6.QtWidgets import QApplication, QMainWindow, QTreeWidget, QTreeWidgetItem
+from PyQt6.QtCore import Qt, QMimeData
+from PyQt6.QtGui import QDropEvent
 
-class MyFrame(wx.Frame):
+
+class MainWindow(QMainWindow):
     def __init__(self):
-        wx.Frame.__init__(self, None, wx.ID_ANY, "ListCtrl Example", size=(400, 300))
+        super().__init__()
 
-        panel = wx.Panel(self, wx.ID_ANY)
-        self.list_ctrl = wx.ListCtrl(panel, wx.ID_ANY, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
+        self.tree_widget = QTreeWidget(self)
+        self.tree_widget.setHeaderLabels(['序号', '文件夹名称'])
+        self.tree_widget.setDragEnabled(True)
+        self.tree_widget.setAcceptDrops(True)
+        self.tree_widget.viewport().setAcceptDrops(True)
+        self.tree_widget.setDropIndicatorShown(True)
+        self.setCentralWidget(self.tree_widget)
 
-        self.list_ctrl.InsertColumn(0, "Name")
-        self.list_ctrl.InsertColumn(1, "Age")
-        self.list_ctrl.InsertItem(0, "John Doe")
-        self.list_ctrl.SetItem(0, 1, "25")
-        self.list_ctrl.InsertItem(1, "Jane Smith")
-        self.list_ctrl.SetItem(1, 1, "30")
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasUrls():
+            event.acceptProposedAction()
 
-        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_item_selected, self.list_ctrl)
+    def dropEvent(self, event: QDropEvent):
+        mime_data = event.mimeData()
+        if mime_data.hasUrls():
+            urls = mime_data.urls()
+            for url in urls:
+                path = url.toLocalFile()
+                folder_name = QTreeWidgetItem([str(self.tree_widget.topLevelItemCount()), path])
+                self.tree_widget.addTopLevelItem(folder_name)
 
-    def on_item_selected(self, event):
-        selected_index = self.list_ctrl.GetFirstSelected()
-        print("Selected Row: ", selected_index)
+            event.acceptProposedAction()
 
-app = wx.App()
-frame = MyFrame()
-frame.Show()
-app.MainLoop()
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec())
