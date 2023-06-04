@@ -4,7 +4,7 @@ import sys
 from PySide6 import QtGui, QtWidgets
 
 from module import gui
-from module import ap
+from module import gui_pyside
 
 
 # if __name__ == "__main__":
@@ -16,6 +16,6 @@ from module import ap
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
-    window = ap.MyWidget()
+    window = gui_pyside.MyWidget()
     window.show()
     sys.exit(app.exec())
