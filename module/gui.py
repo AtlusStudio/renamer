@@ -224,9 +224,11 @@ class DropFolder(wx.FileDropTarget):
 
     def OnDropFiles(self, x, y, file_path_list):
         for file_path in file_path_list:
+            print(file_path)
             # 判断是否为文件夹
             if os.path.isdir(file_path):
                 file_name = os.path.basename(file_path)
+                print(file_name)
 
                 # 判断是否存在相同文件夹，并写入 file_path_exist 列表
                 if file_path not in self.file_path_exist:

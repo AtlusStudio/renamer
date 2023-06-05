@@ -20,11 +20,11 @@ class MyWidget(QtWidgets.QWidget):
         self.tree.setGeometry(15, 15, 970, 260)
         self.tree.setColumnCount(5)
         self.tree.setHeaderLabels(["ID", "文件名", "动画名（本季）", "动画名（首季）", "重命名"])
-        self.tree.setColumnWidth(0, 20)
+        self.tree.setColumnWidth(0, 25)
         self.tree.setColumnWidth(1, 280)
         self.tree.setColumnWidth(2, 170)
         self.tree.setColumnWidth(3, 170)
-        self.tree.setColumnWidth(4, 320)
+        self.tree.setColumnWidth(4, 315)
         self.tree.setRootIsDecorated(False)  # 禁止展开树
 
         # column1 = QtWidgets.QTreeWidgetItem(["1", "Column 2", "Column 3", "Column 4"])
@@ -46,6 +46,10 @@ class MyWidget(QtWidgets.QWidget):
         for raw_path in raw_path_list:
             # 转换原始格式到文件路径
             file_path = raw_path.toLocalFile()
+
+            # 解决 macOS 下路径无法识别
+            if file_path.endswith('/'):
+                file_path = file_path[:-1]
 
             # 判断是文件夹还是文件
             if os.path.isdir(file_path):
