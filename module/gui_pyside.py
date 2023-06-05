@@ -1,6 +1,7 @@
 import os
-import requests
 from PySide6 import QtCore, QtGui, QtWidgets
+
+from module import function
 
 
 class MyWidget(QtWidgets.QWidget):
@@ -27,15 +28,15 @@ class MyWidget(QtWidgets.QWidget):
         self.tree.setColumnWidth(3, 170)
         self.tree.setColumnWidth(4, 300)
         self.tree.setRootIsDecorated(False)  # 禁止展开树
+        self.tree.currentItemChanged.connect(self.show_select_list)
 
         # image_url = "https://lain.bgm.tv/pic/cover/l/98/5e/386809_1yR81.jpg"
         # image_data = requests.get(image_url).content
         # self.image = QtGui.QPixmap().scaled(142, 205)
         # self.image.loadFromData(image_data)
 
-
-        self.pixmap = QtGui.QPixmap("img/default.jpg")
-        self.pixmap.scaled(142, 205)
+        self.pixmap = QtGui.QPixmap("img/400.jpg")
+        self.pixmap = self.pixmap.scaledToWidth(142)
 
         self.image = QtWidgets.QLabel(self)
         self.image.setMinimumSize(142, 205)
@@ -48,8 +49,8 @@ class MyWidget(QtWidgets.QWidget):
         self.info_cn_name = QtWidgets.QLabel("中文名：", self)
         self.info_cn_name.setMaximumWidth(4000)
 
-        self.info_pure_name = QtWidgets.QLabel("动画系列：", self)
-        self.info_pure_name.setMaximumWidth(4000)
+        self.b_initial_name = QtWidgets.QLabel("动画系列：", self)
+        self.b_initial_name.setMaximumWidth(4000)
 
         self.info_type = QtWidgets.QLabel("动画类型：", self)
         self.info_type.setMaximumWidth(4000)
@@ -68,7 +69,7 @@ class MyWidget(QtWidgets.QWidget):
         self.label_container.setLayout(self.label_layout)       # 添加内容到子布局
         self.label_layout.addWidget(self.info_jp_name)
         self.label_layout.addWidget(self.info_cn_name)
-        self.label_layout.addWidget(self.info_pure_name)
+        self.label_layout.addWidget(self.b_initial_name)
         self.label_layout.addWidget(self.info_type)
         self.label_layout.addWidget(self.info_release_date)
         self.label_layout.addStretch()
@@ -84,11 +85,6 @@ class MyWidget(QtWidgets.QWidget):
         self.infobox = QtWidgets.QGroupBox("动画信息", self)
         self.infobox.setFixedHeight(260)
         self.infobox.setLayout(self.info_layout)
-
-
-
-
-
 
         # column1 = QtWidgets.QTreeWidgetItem(["1", "Column 2", "Column 3", "Column 4"])
         # self.tree.addTopLevelItem(column1)
@@ -107,6 +103,7 @@ class MyWidget(QtWidgets.QWidget):
 
         self.btn_analysis = QtWidgets.QPushButton("开始识别", self)
         self.btn_analysis.setFixedWidth(100)
+        self.btn_analysis.clicked.connect(self.start_analysis)
 
         self.btn_rename = QtWidgets.QPushButton("重命名", self)
         self.btn_rename.setFixedWidth(100)
@@ -128,21 +125,57 @@ class MyWidget(QtWidgets.QWidget):
         self.layout.addWidget(self.btn_container)
         self.layout.addStretch()
 
-
-
-
+    # 打印列表
     @QtCore.Slot()
     def print_list(self):
-        print(self.anime_list)
+        print(f"anime_list: {self.anime_list}")
+        print(f"file_path_exist: {self.file_path_exist}")
         self.state.setText(str(self.anime_list))
 
+    # 显示选中动画的详情
+    @QtCore.Slot()
+    def show_select_list(self, current):
+        # 根据选中的行数索引计算 list_id
+        list_id = self.tree.indexOfTopLevelItem(current)
+        list_id = list_id + 1
+        # print(list_id)
 
+    # 开始分析
+    @QtCore.Slot()
+    def start_analysis(self):
+        # 清空动画列表
+        self.anime_list = []
 
+        # 判断路径列表是否为空
+        if not self.file_path_exist:
+            print("请先拖入文件夹")
+        else:
+            list_id = 1
+            for file_path in self.file_path_exist:
 
+                # 获取循环内单个动画的数据，并写入 anime_list
+                this_anime_dict = function.get_anime_info(list_id, file_path)
+                self.anime_list.append(this_anime_dict)
+                print(self.anime_list)
 
+                # 展示在列表中
+                # 如果没有 b_initial_id 说明没执行到最后一步
+                if "b_initial_id" in this_anime_dict:
+                    list_id = this_anime_dict["list_id"]
+                    list_order = list_id - 1
+                    file_name = this_anime_dict["file_name"]
+                    b_cn_name = this_anime_dict["b_cn_name"]
+                    b_initial_name = this_anime_dict["b_initial_name"]
 
+                    self.tree.topLevelItem(list_order).setText(0, str(list_id))
+                    self.tree.topLevelItem(list_order).setText(1, file_name)
+                    self.tree.topLevelItem(list_order).setText(2, b_cn_name)
+                    self.tree.topLevelItem(list_order).setText(3, b_initial_name)
+                else:
+                    print("该动画未获取到内容，已跳过")
 
-
+                # 进入下一轮前修改 ID
+                list_id += 1
 
     # 鼠标进入同时，检测对象是否为 URL 并允许拖放
     def dragEnterEvent(self, event):
@@ -168,22 +201,12 @@ class MyWidget(QtWidgets.QWidget):
                     # 写入动画路径列表,用于识别去重
                     self.file_path_exist.append(file_path)
 
-                    # 为当前项目创建字典（第一次）
-                    this_anime_list = dict()
-
-                    # 写入刚创建的字典
-                    this_anime_list["list_id"] = self.list_id
-                    this_anime_list["file_name"] = file_name
-                    this_anime_list["file_path"] = file_path
-
-                    # 写入动画列表
-                    self.anime_list.append(this_anime_list)
-
                     # 显示在 tree 中
                     this_column = QtWidgets.QTreeWidgetItem([str(self.list_id), file_name])
                     self.tree.addTopLevelItem(this_column)
-                    self.list_id += 1
                     print(f"新增了{file_name}")
+
+                    self.list_id += 1
                 else:
                     print(f"{file_name}已存在")
             else:

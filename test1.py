@@ -1,31 +1,20 @@
-import sys
-from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QSpacerItem, QSizePolicy
+from PyQt6.QtWidgets import QApplication, QLabel, QWidget
+from PyQt6.QtGui import QPixmap
 
-class MainWindow(QWidget):
-    def __init__(self):
-        super().__init__()
+app = QApplication([])
 
-        self.initUI()
+window = QWidget()
 
-    def initUI(self):
-        self.setWindowTitle('Spacing Example')
+label = QLabel(window)
 
-        layout = QVBoxLayout()
+pixmap = QPixmap('img/default.jpg')
 
-        label1 = QLabel('Label 1')
-        label2 = QLabel('Label 2')
-        label3 = QLabel('Label 3')
+label.setFixedSize(pixmap.width(), pixmap.height())
 
-        # 设置上方间距
-        layout.addWidget(label1)
-        layout.addItem(QSpacerItem(0, 20, QSizePolicy.Minimum, QSizePolicy.Fixed))
-        layout.addWidget(label2)
-        layout.addWidget(label3)
+# 设置QLabel的背景图片，并自适应大小
+label.setPixmap(pixmap)
+label.setScaledContents(True)
 
-        self.setLayout(layout)
-        self.show()
+window.show()
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    window = MainWindow()
-    sys.exit(app.exec())
+app.exec()
