@@ -1,4 +1,5 @@
 import os
+import requests
 from PySide6 import QtCore, QtGui, QtWidgets
 
 
@@ -6,34 +7,142 @@ class MyWidget(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Bangumi Renamer")
-        self.resize(1000, 670)
-        self.setFixedSize(self.size())
-        self.setup_ui()
+        self.resize(1000, -1)
+        # self.setFixedSize(self.size())  # 禁止拉伸窗口
         self.setAcceptDrops(True)
+        self.setup_ui()
 
         self.anime_list = []        # 动画列表，存入所有数据
         self.file_path_exist = []   # 动画路径列表（仅用于对比是否存在相同项目）
         self.list_id = 1            # ID 计数器
 
-    def setup_ui(self):
+    def setup_ui(self) -> None:
         self.tree = QtWidgets.QTreeWidget(self)
-        self.tree.setGeometry(15, 15, 970, 260)
+        self.tree.setFixedHeight(260)
         self.tree.setColumnCount(5)
         self.tree.setHeaderLabels(["ID", "文件名", "动画名（本季）", "动画名（首季）", "重命名"])
         self.tree.setColumnWidth(0, 25)
         self.tree.setColumnWidth(1, 280)
         self.tree.setColumnWidth(2, 170)
         self.tree.setColumnWidth(3, 170)
-        self.tree.setColumnWidth(4, 315)
+        self.tree.setColumnWidth(4, 300)
         self.tree.setRootIsDecorated(False)  # 禁止展开树
+
+        # image_url = "https://lain.bgm.tv/pic/cover/l/98/5e/386809_1yR81.jpg"
+        # image_data = requests.get(image_url).content
+        # self.image = QtGui.QPixmap().scaled(142, 205)
+        # self.image.loadFromData(image_data)
+
+
+        self.pixmap = QtGui.QPixmap("img/default.jpg")
+        self.pixmap.scaled(142, 205)
+
+        self.image = QtWidgets.QLabel(self)
+        self.image.setMinimumSize(142, 205)
+        self.image.setMaximumSize(142, 205)
+        self.image.setPixmap(self.pixmap)
+
+        self.info_jp_name = QtWidgets.QLabel("动画：", self)
+        self.info_jp_name.setMaximumWidth(4000)
+
+        self.info_cn_name = QtWidgets.QLabel("中文名：", self)
+        self.info_cn_name.setMaximumWidth(4000)
+
+        self.info_pure_name = QtWidgets.QLabel("动画系列：", self)
+        self.info_pure_name.setMaximumWidth(4000)
+
+        self.info_type = QtWidgets.QLabel("动画类型：", self)
+        self.info_type.setMaximumWidth(4000)
+
+        self.info_release_date = QtWidgets.QLabel("放送日期：", self)
+        self.info_release_date.setMaximumWidth(4000)
+
+        self.info_file_name = QtWidgets.QLabel("文件名：", self)
+        self.info_file_name.setMaximumWidth(4000)
+
+        self.info_final_name = QtWidgets.QLabel("重命名结果：", self)
+        self.info_final_name.setMaximumWidth(4000)
+
+        self.label_layout = QtWidgets.QVBoxLayout(self)       # 创建子布局
+        self.label_container = QtWidgets.QWidget()            # 创建子布局控件
+        self.label_container.setLayout(self.label_layout)       # 添加内容到子布局
+        self.label_layout.addWidget(self.info_jp_name)
+        self.label_layout.addWidget(self.info_cn_name)
+        self.label_layout.addWidget(self.info_pure_name)
+        self.label_layout.addWidget(self.info_type)
+        self.label_layout.addWidget(self.info_release_date)
+        self.label_layout.addStretch()
+        self.label_layout.addWidget(self.info_file_name)
+        self.label_layout.addWidget(self.info_final_name)
+
+        self.info_layout = QtWidgets.QHBoxLayout(self)       # 创建子布局
+        self.info_container = QtWidgets.QWidget()            # 创建子布局控件
+        self.info_container.setLayout(self.info_layout)       # 添加内容到子布局
+        self.info_layout.addWidget(self.image)
+        self.info_layout.addWidget(self.label_container)
+
+        self.infobox = QtWidgets.QGroupBox("动画信息", self)
+        self.infobox.setFixedHeight(260)
+        self.infobox.setLayout(self.info_layout)
+
+
+
+
+
 
         # column1 = QtWidgets.QTreeWidgetItem(["1", "Column 2", "Column 3", "Column 4"])
         # self.tree.addTopLevelItem(column1)
         #
         # self.tree.topLevelItem(1).setText(4, "MainWindow")  # 更改内容
 
-        # icon = QtGui.QIcon("../../../Resources/Icons/Python_128px.png")
-        # button = QtWidgets.QPushButton(icon, "普通按钮", self)
+        self.state = QtWidgets.QLabel("等待拖入文件", self)
+        self.state.setMinimumWidth(400)
+        self.state.setMaximumWidth(4000)
+
+        self.progress = QtWidgets.QProgressBar()
+
+        self.btn_clear = QtWidgets.QPushButton("print", self)
+        self.btn_clear.setFixedWidth(100)
+        self.btn_clear.clicked.connect(self.print_list)
+
+        self.btn_analysis = QtWidgets.QPushButton("开始识别", self)
+        self.btn_analysis.setFixedWidth(100)
+
+        self.btn_rename = QtWidgets.QPushButton("重命名", self)
+        self.btn_rename.setFixedWidth(100)
+
+        self.btn_layout = QtWidgets.QHBoxLayout(self)       # 创建子布局
+        self.btn_container = QtWidgets.QWidget()            # 创建子布局控件
+        self.btn_container.setLayout(self.btn_layout)       # 添加内容到子布局
+        self.btn_layout.addWidget(self.state)
+        self.btn_layout.addStretch()
+        self.btn_layout.addWidget(self.btn_clear)
+        self.btn_layout.addWidget(self.btn_analysis)
+        self.btn_layout.addWidget(self.btn_rename)
+
+        # 添加布局
+        self.layout = QtWidgets.QVBoxLayout(self)
+        self.layout.addWidget(self.tree)
+        self.layout.addWidget(self.infobox)
+        self.layout.addWidget(self.progress)
+        self.layout.addWidget(self.btn_container)
+        self.layout.addStretch()
+
+
+
+
+    @QtCore.Slot()
+    def print_list(self):
+        print(self.anime_list)
+        self.state.setText(str(self.anime_list))
+
+
+
+
+
+
+
+
 
     # 鼠标进入同时，检测对象是否为 URL 并允许拖放
     def dragEnterEvent(self, event):
