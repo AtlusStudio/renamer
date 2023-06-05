@@ -1,20 +1,19 @@
-from PyQt6.QtWidgets import QApplication, QLabel, QWidget
-from PyQt6.QtGui import QPixmap
+from joblib import Parallel, delayed
+import time, math
 
-app = QApplication([])
 
-window = QWidget()
+def my_fun(i):
+    time.sleep(1)
+    t = math.sqrt(i ** 2)
+    print(t)
+    return t
 
-label = QLabel(window)
 
-pixmap = QPixmap('img/default.jpg')
+num = 4
+start = time.time()
 
-label.setFixedSize(pixmap.width(), pixmap.height())
+Parallel(n_jobs=4)(delayed(my_fun)(i) for i in range(num))
 
-# 设置QLabel的背景图片，并自适应大小
-label.setPixmap(pixmap)
-label.setScaledContents(True)
+end = time.time()
 
-window.show()
-
-app.exec()
+print('{:.4f} s'.format(end - start))
