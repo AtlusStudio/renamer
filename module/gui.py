@@ -1,5 +1,6 @@
 import os
 import arrow
+import threading
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from module import function
@@ -195,30 +196,35 @@ class MyWidget(QtWidgets.QWidget):
         else:
             list_id = 1
             for file_path in self.file_path_exist:
-
-                # 获取循环内单个动画的数据，并写入 anime_list
-                this_anime_dict = function.get_anime_info(list_id, file_path)
-                self.anime_list.append(this_anime_dict)
-                print(self.anime_list)
-
-                # 展示在列表中
-                # 如果没有 b_initial_id 说明没执行到最后一步
-                if "b_initial_id" in this_anime_dict:
-                    list_id = this_anime_dict["list_id"]
-                    list_order = list_id - 1
-                    file_name = this_anime_dict["file_name"]
-                    b_cn_name = this_anime_dict["b_cn_name"]
-                    b_initial_name = this_anime_dict["b_initial_name"]
-
-                    self.tree.topLevelItem(list_order).setText(0, str(list_id))
-                    self.tree.topLevelItem(list_order).setText(1, file_name)
-                    self.tree.topLevelItem(list_order).setText(2, b_cn_name)
-                    self.tree.topLevelItem(list_order).setText(3, b_initial_name)
-                else:
-                    print("该动画未获取到内容，已跳过")
-
-                # 进入下一轮前修改 ID
+                # 在单独的线程中运行get_anime_info函数
+                thread = threading.Thread(target=self.process_anime_info, args=(list_id, file_path))
+                thread.start()
                 list_id += 1
+
+    def process_anime_info(self, list_id, file_path):
+        # 获取循环内单个动画的数据，并写入 anime_list
+        this_anime_dict = function.get_anime_info(list_id, file_path)
+        self.anime_list.append(this_anime_dict)
+        print(self.anime_list)
+
+        # 排序动画列表 anime_list
+        self.anime_list = sorted(self.anime_list, key=lambda x: x['list_id'])
+
+        # 展示在列表中
+        # 如果没有 b_initial_id 说明没执行到最后一步
+        if "b_initial_id" in this_anime_dict:
+            list_id = this_anime_dict["list_id"]
+            list_order = list_id - 1
+            file_name = this_anime_dict["file_name"]
+            b_cn_name = this_anime_dict["b_cn_name"]
+            b_initial_name = this_anime_dict["b_initial_name"]
+
+            self.tree.topLevelItem(list_order).setText(0, str(list_id))
+            self.tree.topLevelItem(list_order).setText(1, file_name)
+            self.tree.topLevelItem(list_order).setText(2, b_cn_name)
+            self.tree.topLevelItem(list_order).setText(3, b_initial_name)
+        else:
+            print("该动画未获取到内容，已跳过")
 
     # 鼠标进入同时，检测对象是否为 URL 并允许拖放
     def dragEnterEvent(self, event):
