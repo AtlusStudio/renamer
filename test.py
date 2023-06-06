@@ -19,5 +19,4 @@ async def main():
         for name, result in zip(names, results):
             print(f"搜索结果 - {name}: {result}")
 
-loop = asyncio.get_event_loop()
-loop.run_until_complete(main())
+asyncio.run(main())
