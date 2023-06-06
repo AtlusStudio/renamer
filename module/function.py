@@ -70,6 +70,15 @@ def get_anime_info(list_id, file_path):
     else:
         this_anime_dict.update(bangumi_result)
 
+    # 向 bangumi Subject 请求数据
+    b_id = str(bangumi_result["b_id"])
+    bangumi_info_result = api.bangumi_subject(b_id)
+    if bangumi_info_result is None:
+        print(f"无法请求到{a_jp_name}的Bangumi数据")
+        return this_anime_dict
+    else:
+        this_anime_dict.update(bangumi_info_result)
+
     # 向 Bangumi Previous 请求数据
     b_id = str(bangumi_result["b_id"])
     b_cn_name = bangumi_result["b_cn_name"]

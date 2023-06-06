@@ -1,7 +1,7 @@
 import requests
 import json
-import time  # 延迟操作
-import arrow  # 处理时间格式
+import time     # 延迟操作
+import arrow    # 处理时间格式
 
 
 # 向 Anilist 请求数据
@@ -93,6 +93,48 @@ def bangumi_search(a_jp_name):
 
     print(f"在Bangumi中搜索{a_jp_name}失败")
 
+# 向 Bangumi Subject 请求数据(/v0/subjects/subject_id)
+# https://bangumi.github.io/api/
+def bangumi_subject(b_id):
+    headers = {
+        'accept': 'application/json',
+        'User-Agent': 'akko/bgm-renamer'
+    }
+
+    url = "https://api.bgm.tv/v0/subjects/" + b_id
+    print(f"正在向Bangumi请求ID {b_id}的详细信息")
+
+    # 3次重试机会，避免网络原因导致请求失败
+    retry = 0
+    while retry < 3:
+        response = requests.get(url, headers=headers)
+
+        if response.status_code == 200:
+            result = json.loads(response.text)
+            print(f"成功获取到ID {b_id}的详细信息")
+
+            b_type = result["platform"]
+            b_release_date = result["date"]
+            b_episodes = result["eps"]
+
+            # 使用 arrow 库将时间处理成指定格式
+            b_release_date = arrow.get(b_release_date).format("YYMMDD")
+
+            b_dict = dict()
+            b_dict["b_type"] = b_type
+            b_dict["b_release_date"] = b_release_date
+            b_dict["b_episodes"] = b_episodes
+            return b_dict
+
+        # 若请求失败，等待0.5秒重试
+        else:
+            print("Bangumi请求更多失败，重试" + str(retry + 1))
+            time.sleep(0.5)
+            retry += 1
+
+    print(f"向Bangumi请求ID {b_id}的详细信息失败")
+
+
 # 向 Bangumi Previous 请求数据(v0/subjects/subjects)
 # https://bangumi.github.io/api/
 def bangumi_previous(b_id, b_cn_name):
@@ -152,8 +194,8 @@ def set_format(type):
 
 
 
-# idd = str(371546)
-#
-#
-# result = anilist("Drifting Home")
+
+
+# idd = str(315745)
+# result = bangumi_subject(idd)
 # print(result)
