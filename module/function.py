@@ -122,14 +122,14 @@ def get_anime_info(list_id, file_path):
     print(f"图片已经保存至{img_dir}/{img_name}")
     this_anime_dict["b_image_name"] = img_name
 
-    # 写入命名规则
+    # 写入命名结果
     final_name = get_final_name(this_anime_dict)
-    print(f"该动画将重命名为{final_name}")
     this_anime_dict["final_name"] = final_name
+    print(f"该动画将重命名为{final_name}")
 
     return this_anime_dict
 
-# 定义命名规则
+# 获取命名结果
 def get_final_name(this_anime_dict):
     b_cn_name = this_anime_dict["b_cn_name"]
     b_type = format_b_type(this_anime_dict["b_type"])
@@ -138,6 +138,11 @@ def get_final_name(this_anime_dict):
 
     rename_style = "{b_cn_name}/[{b_type}] [{b_release_date}] {b_jp_name}"
     final_name = eval(f'f"{rename_style}"')
+
+    # # 根据系统变化路径分隔符
+    # separator = os.path.sep  # 获取当前操作系统的路径分隔符
+    # final_name = final_name.replace('/', separator)
+
     print(final_name)
     return final_name
 
@@ -164,5 +169,6 @@ def format_b_type(b_type):
 
 
 
-# this_anime_dict = {'list_id': 1, 'file_name': '[Moozzi2] Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e S2 [ x265-10Bit Ver. ] - TV + SP', 'file_path': '/Users/akko/Downloads/[Moozzi2] Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e S2 [ x265-10Bit Ver. ] - TV + SP', 'romaji_name': 'Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e S2', 'a_jp_name': 'ようこそ実力至上主義の教室へ 2nd Season', 'a_type': 'TV', 'b_id': 371546, 'b_jp_name': 'ようこそ実力至上主義の教室へ 2nd Season', 'b_cn_name': '欢迎来到实力至上主义教室 第二季', 'b_image': 'http://lain.bgm.tv/pic/cover/l/c8/8a/371546_Df9ri.jpg', 'b_type': 'TV', 'b_release_date': '220704', 'b_episodes': 13, 'b_initial_id': '214272', 'b_initial_name': '欢迎来到实力至上主义教室', 'b_image_name': '371546_Df9ri.jpg'}
+# this_anime_dict = {'final_name': 'sgsgs/fsfsf', 'list_id': 1, 'file_name': '[Moozzi2] Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e S2 [ x265-10Bit Ver. ] - TV + SP', 'file_path': '/Users/akko/Downloads/[Moozzi2] Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e S2 [ x265-10Bit Ver. ] - TV + SP', 'romaji_name': 'Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e S2', 'a_jp_name': 'ようこそ実力至上主義の教室へ 2nd Season', 'a_type': 'TV', 'b_id': 371546, 'b_jp_name': 'ようこそ実力至上主義の教室へ 2nd Season', 'b_cn_name': '欢迎来到实力至上主义教室 第二季', 'b_image': 'http://lain.bgm.tv/pic/cover/l/c8/8a/371546_Df9ri.jpg', 'b_type': 'TV', 'b_release_date': '220704', 'b_episodes': 13, 'b_initial_id': '214272', 'b_initial_name': '欢迎来到实力至上主义教室', 'b_image_name': '371546_Df9ri.jpg'}
 # get_final_name(this_anime_dict)
+# get_final_path(this_anime_dict)

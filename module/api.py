@@ -176,16 +176,6 @@ def bangumi_previous(b_id, b_cn_name):
 
 
 
-
-
-
-# 格式化动画类型 a_type
-
-
-
-
-
-
 # idd = str(315745)
 # result = bangumi_subject(idd)
 # print(result)
