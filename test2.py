@@ -1,11 +1,13 @@
-import asyncio
+# 原始数组
+my_array = [
+    {"list_id": 3, "other_key": "value3"},
+    {"list_id": 1, "other_key": "value1"},
+    {"list_id": 2, "other_key": "value2"}
+]
 
-async def heavy_task():
-    print("1")
-    await asyncio.sleep(2)
+# 使用sorted函数进行排序，根据字典中的'list_id'键进行排序
+sorted_array = sorted(my_array, key=lambda x: x['list_id'])
 
-async def main():
-    for _ in range(5):
-        await heavy_task()
 
-asyncio.run(main())
+
+print(sorted_array)

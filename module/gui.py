@@ -1,5 +1,7 @@
 import os
 import arrow
+import threading
+import shutil
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from module import function
@@ -96,7 +98,7 @@ class MyWidget(QtWidgets.QWidget):
         self.state.setMinimumWidth(400)
         self.state.setMaximumWidth(4000)
 
-        self.progress = QtWidgets.QProgressBar()
+        # self.progress = QtWidgets.QProgressBar()
 
         self.btn_clear = QtWidgets.QPushButton("print", self)
         self.btn_clear.setFixedWidth(100)
@@ -108,6 +110,7 @@ class MyWidget(QtWidgets.QWidget):
 
         self.btn_rename = QtWidgets.QPushButton("重命名", self)
         self.btn_rename.setFixedWidth(100)
+        self.btn_rename.clicked.connect(self.start_rename)
 
         self.btn_layout = QtWidgets.QHBoxLayout(self)       # 创建子布局
         self.btn_container = QtWidgets.QWidget()            # 创建子布局控件
@@ -122,7 +125,7 @@ class MyWidget(QtWidgets.QWidget):
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.addWidget(self.tree)
         self.layout.addWidget(self.infobox)
-        self.layout.addWidget(self.progress)
+        # self.layout.addWidget(self.progress)
         self.layout.addWidget(self.btn_container)
         self.layout.addStretch()
 
@@ -163,7 +166,8 @@ class MyWidget(QtWidgets.QWidget):
             file_name = self.anime_list[select_order]["file_name"]
             self.info_file_name.setText(f"文件名：{file_name}")
 
-            final_name = self.anime_list[select_order]["file_name"]
+            final_name = self.anime_list[select_order]["final_name"]
+            final_name = final_name.replace("/", " / ")
             self.info_final_name.setText(f"重命名结果：{final_name}")
 
             b_image_name = self.anime_list[select_order]["b_image_name"]
@@ -195,30 +199,94 @@ class MyWidget(QtWidgets.QWidget):
         else:
             list_id = 1
             for file_path in self.file_path_exist:
-
-                # 获取循环内单个动画的数据，并写入 anime_list
-                this_anime_dict = function.get_anime_info(list_id, file_path)
-                self.anime_list.append(this_anime_dict)
-                print(self.anime_list)
-
-                # 展示在列表中
-                # 如果没有 b_initial_id 说明没执行到最后一步
-                if "b_initial_id" in this_anime_dict:
-                    list_id = this_anime_dict["list_id"]
-                    list_order = list_id - 1
-                    file_name = this_anime_dict["file_name"]
-                    b_cn_name = this_anime_dict["b_cn_name"]
-                    b_initial_name = this_anime_dict["b_initial_name"]
-
-                    self.tree.topLevelItem(list_order).setText(0, str(list_id))
-                    self.tree.topLevelItem(list_order).setText(1, file_name)
-                    self.tree.topLevelItem(list_order).setText(2, b_cn_name)
-                    self.tree.topLevelItem(list_order).setText(3, b_initial_name)
-                else:
-                    print("该动画未获取到内容，已跳过")
-
-                # 进入下一轮前修改 ID
+                # 在单独的线程中运行get_anime_info函数
+                thread = threading.Thread(target=self.process_anime_info, args=(list_id, file_path))
+                thread.start()
                 list_id += 1
+
+    def process_anime_info(self, list_id, file_path):
+        # 获取循环内单个动画的数据，并写入 anime_list
+        this_anime_dict = function.get_anime_info(list_id, file_path)
+        self.anime_list.append(this_anime_dict)
+
+        # 排序动画列表 anime_list
+        self.anime_list = sorted(self.anime_list, key=lambda x: x['list_id'])
+
+        # 展示在列表中
+        # 如果没有 b_initial_id 说明没执行到最后一步
+        if "b_initial_id" in this_anime_dict:
+            list_id = this_anime_dict["list_id"]
+            list_order = list_id - 1
+            file_name = this_anime_dict["file_name"]
+            b_cn_name = this_anime_dict["b_cn_name"]
+            b_initial_name = this_anime_dict["b_initial_name"]
+            final_name = this_anime_dict["final_name"]
+
+            self.tree.topLevelItem(list_order).setText(0, str(list_id))
+            self.tree.topLevelItem(list_order).setText(1, file_name)
+            self.tree.topLevelItem(list_order).setText(2, b_cn_name)
+            self.tree.topLevelItem(list_order).setText(3, b_initial_name)
+            self.tree.topLevelItem(list_order).setText(4, final_name)
+        else:
+            print("该动画未获取到内容，已跳过")
+
+    # 开始命名
+    @QtCore.Slot()
+    def start_rename(self):
+        # anime_list 是否有数据
+        if not self.anime_list:
+            print("请先拖入文件或开始分析")
+            return
+
+        # 列出有 anime_list 中有 final_name 的索引
+        final_name_order = []
+        for index, dictionary in enumerate(self.anime_list):
+            if "final_name" in dictionary:
+                final_name_order.append(index)
+
+        # 如果分析后都没有能命名的文件，退出执行
+        if not final_name_order:
+            print("当前没有需要重命名的文件夹")
+            return
+        else:
+            print(f"即将重命名下列ID：{final_name_order}")
+
+        # 开始执行命名
+        for order in final_name_order:
+            this_anime_dict = self.anime_list[order]
+
+            # 拆分 final_name 的前后文件夹
+            final_name = this_anime_dict['final_name']
+            if '/' in final_name:
+                final_name_list = final_name.split('/')
+                final_name_1 = final_name_list[0]
+                final_name_2 = final_name_list[1]
+                print(final_name_1)
+                print(final_name_2)
+            else:
+                final_name_1 = final_name
+                print(final_name_1)
+
+            # 更改当前文件夹名称
+            file_path = this_anime_dict['file_path']
+            file_dir = os.path.dirname(file_path)
+            final_path_2 = os.path.join(file_dir, final_name_2)
+            os.rename(file_path, final_path_2)
+
+            # 创建父文件夹
+            final_path_1 = os.path.join(file_dir, final_name_1)
+            if not os.path.exists(final_path_1):
+                os.makedirs(final_path_1)
+
+            # 修改 / 为当前系统下的正确分隔符
+            separator = os.path.sep
+            final_name = final_name.replace('/', separator)
+
+            # 移动至父文件夹
+            final_path = os.path.join(file_dir, final_name)
+            shutil.move(final_path_2, final_path)
+            b_cn_name = this_anime_dict['b_cn_name']
+            print(f"{b_cn_name}重命名成功")
 
     # 鼠标进入同时，检测对象是否为 URL 并允许拖放
     def dragEnterEvent(self, event):

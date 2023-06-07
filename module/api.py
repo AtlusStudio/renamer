@@ -176,26 +176,6 @@ def bangumi_previous(b_id, b_cn_name):
 
 
 
-
-
-
-# 格式化动画类型 a_type
-def set_format(type):
-    if type in ["TV", "TV_SHORT"]:
-        a_type = "1.TV"
-    elif type in ["MOVIE"]:
-        a_type = "2.MOVIE"
-    elif type in ["SPECIAL", "OVA", "ONA"]:
-        a_type = "3.SP"
-    else:
-        a_type = "XBD"
-        print("未知的动画类型，注意检查")
-    return a_type
-
-
-
-
-
 # idd = str(315745)
 # result = bangumi_subject(idd)
 # print(result)
