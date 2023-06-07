@@ -97,7 +97,7 @@ class MyWidget(QtWidgets.QWidget):
         self.state.setMinimumWidth(400)
         self.state.setMaximumWidth(4000)
 
-        self.progress = QtWidgets.QProgressBar()
+        # self.progress = QtWidgets.QProgressBar()
 
         self.btn_clear = QtWidgets.QPushButton("print", self)
         self.btn_clear.setFixedWidth(100)
@@ -123,7 +123,7 @@ class MyWidget(QtWidgets.QWidget):
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.addWidget(self.tree)
         self.layout.addWidget(self.infobox)
-        self.layout.addWidget(self.progress)
+        # self.layout.addWidget(self.progress)
         self.layout.addWidget(self.btn_container)
         self.layout.addStretch()
 
@@ -164,7 +164,7 @@ class MyWidget(QtWidgets.QWidget):
             file_name = self.anime_list[select_order]["file_name"]
             self.info_file_name.setText(f"文件名：{file_name}")
 
-            final_name = self.anime_list[select_order]["file_name"]
+            final_name = self.anime_list[select_order]["final_name"]
             self.info_final_name.setText(f"重命名结果：{final_name}")
 
             b_image_name = self.anime_list[select_order]["b_image_name"]
@@ -218,11 +218,13 @@ class MyWidget(QtWidgets.QWidget):
             file_name = this_anime_dict["file_name"]
             b_cn_name = this_anime_dict["b_cn_name"]
             b_initial_name = this_anime_dict["b_initial_name"]
+            final_name = this_anime_dict["final_name"]
 
             self.tree.topLevelItem(list_order).setText(0, str(list_id))
             self.tree.topLevelItem(list_order).setText(1, file_name)
             self.tree.topLevelItem(list_order).setText(2, b_cn_name)
             self.tree.topLevelItem(list_order).setText(3, b_initial_name)
+            self.tree.topLevelItem(list_order).setText(4, final_name)
         else:
             print("该动画未获取到内容，已跳过")
 
