@@ -33,11 +33,6 @@ class MyWidget(QtWidgets.QWidget):
         self.tree.setRootIsDecorated(False)  # 禁止展开树
         self.tree.currentItemChanged.connect(self.show_select_list)
 
-        # image_url = "https://lain.bgm.tv/pic/cover/l/98/5e/386809_1yR81.jpg"
-        # image_data = requests.get(image_url).content
-        # self.image = QtGui.QPixmap().scaled(142, 205)
-        # self.image.loadFromData(image_data)
-
         self.pixmap = QtGui.QPixmap("img/default.png")
         self.pixmap = self.pixmap.scaledToWidth(142)
 
@@ -67,8 +62,8 @@ class MyWidget(QtWidgets.QWidget):
         self.info_final_name = QtWidgets.QLabel("重命名结果：", self)
         self.info_final_name.setMaximumWidth(4000)
 
-        self.label_layout = QtWidgets.QVBoxLayout(self)       # 创建子布局
-        self.label_container = QtWidgets.QWidget()            # 创建子布局控件
+        self.label_layout = QtWidgets.QVBoxLayout(self)         # 创建子布局：文本标签
+        self.label_container = QtWidgets.QWidget()              # 创建子布局控件
         self.label_container.setLayout(self.label_layout)       # 添加内容到子布局
         self.label_layout.addWidget(self.info_jp_name)
         self.label_layout.addWidget(self.info_cn_name)
@@ -79,9 +74,9 @@ class MyWidget(QtWidgets.QWidget):
         self.label_layout.addWidget(self.info_file_name)
         self.label_layout.addWidget(self.info_final_name)
 
-        self.info_layout = QtWidgets.QHBoxLayout(self)       # 创建子布局
-        self.info_container = QtWidgets.QWidget()            # 创建子布局控件
-        self.info_container.setLayout(self.info_layout)       # 添加内容到子布局
+        self.info_layout = QtWidgets.QHBoxLayout(self)          # 创建子布局：动画信息
+        self.info_container = QtWidgets.QWidget()               # 创建子布局控件
+        self.info_container.setLayout(self.info_layout)         # 添加内容到子布局
         self.info_layout.addWidget(self.image)
         self.info_layout.addWidget(self.label_container)
 
@@ -89,18 +84,13 @@ class MyWidget(QtWidgets.QWidget):
         self.infobox.setFixedHeight(260)
         self.infobox.setLayout(self.info_layout)
 
-        # column1 = QtWidgets.QTreeWidgetItem(["1", "Column 2", "Column 3", "Column 4"])
-        # self.tree.addTopLevelItem(column1)
-        #
         # self.tree.topLevelItem(1).setText(4, "MainWindow")  # 更改内容
 
         self.state = QtWidgets.QLabel("等待拖入文件", self)
         self.state.setMinimumWidth(400)
         self.state.setMaximumWidth(4000)
 
-        # self.progress = QtWidgets.QProgressBar()
-
-        self.btn_clear = QtWidgets.QPushButton("print", self)
+        self.btn_clear = QtWidgets.QPushButton("清空列表", self)
         self.btn_clear.setFixedWidth(100)
         self.btn_clear.clicked.connect(self.print_list)
 
@@ -112,9 +102,9 @@ class MyWidget(QtWidgets.QWidget):
         self.btn_rename.setFixedWidth(100)
         self.btn_rename.clicked.connect(self.start_rename)
 
-        self.btn_layout = QtWidgets.QHBoxLayout(self)       # 创建子布局
-        self.btn_container = QtWidgets.QWidget()            # 创建子布局控件
-        self.btn_container.setLayout(self.btn_layout)       # 添加内容到子布局
+        self.btn_layout = QtWidgets.QHBoxLayout(self)           # 创建子布局
+        self.btn_container = QtWidgets.QWidget()                # 创建子布局控件
+        self.btn_container.setLayout(self.btn_layout)           # 添加内容到子布局
         self.btn_layout.addWidget(self.state)
         self.btn_layout.addStretch()
         self.btn_layout.addWidget(self.btn_clear)
@@ -125,7 +115,6 @@ class MyWidget(QtWidgets.QWidget):
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.addWidget(self.tree)
         self.layout.addWidget(self.infobox)
-        # self.layout.addWidget(self.progress)
         self.layout.addWidget(self.btn_container)
         self.layout.addStretch()
 
@@ -174,7 +163,6 @@ class MyWidget(QtWidgets.QWidget):
             pixmap = QtGui.QPixmap(f"img/{b_image_name}")
             pixmap = pixmap.scaledToWidth(142)
             self.image.setPixmap(pixmap)
-
         else:
             self.info_jp_name.setText("动画：")
             self.info_cn_name.setText("中文名：")
@@ -190,26 +178,27 @@ class MyWidget(QtWidgets.QWidget):
     # 开始分析
     @QtCore.Slot()
     def start_analysis(self):
-        # 清空动画列表
-        self.anime_list = []
-
-        # 判断路径列表是否为空
+        # 路径列表是否为空
         if not self.file_path_exist:
             print("请先拖入文件夹")
-        else:
-            list_id = 1
-            for file_path in self.file_path_exist:
-                # 在单独的线程中运行get_anime_info函数
-                thread = threading.Thread(target=self.process_anime_info, args=(list_id, file_path))
-                thread.start()
-                list_id += 1
+            return
 
-    def process_anime_info(self, list_id, file_path):
-        # 获取循环内单个动画的数据，并写入 anime_list
+        # 分析过程
+        self.anime_list = []  # 重置动画列表
+        list_id = 1
+        for file_path in self.file_path_exist:
+            # 在单独的线程中运行get_anime_info函数
+            thread = threading.Thread(target=self.start_analysis_thread, args=(list_id, file_path))
+            thread.start()
+            list_id += 1
+
+    # 开始分析线程
+    def start_analysis_thread(self, list_id, file_path):
+        # 获取本线程的动画信息，写入 anime_list
         this_anime_dict = function.get_anime_info(list_id, file_path)
         self.anime_list.append(this_anime_dict)
 
-        # 排序动画列表 anime_list
+        # 重新排序 anime_list 列表，避免串行
         self.anime_list = sorted(self.anime_list, key=lambda x: x['list_id'])
 
         # 展示在列表中
@@ -244,14 +233,14 @@ class MyWidget(QtWidgets.QWidget):
             if "final_name" in dictionary:
                 final_name_order.append(index)
 
-        # 如果分析后都没有能命名的文件，退出执行
+        # 如果没有能命名的文件，退出
         if not final_name_order:
             print("当前没有需要重命名的文件夹")
             return
         else:
             print(f"即将重命名下列ID：{final_name_order}")
 
-        # 开始执行命名
+        # 开始命名
         for order in final_name_order:
             this_anime_dict = self.anime_list[order]
 
@@ -267,7 +256,7 @@ class MyWidget(QtWidgets.QWidget):
                 final_name_1 = final_name
                 print(final_name_1)
 
-            # 更改当前文件夹名称
+            # 更名当前文件夹
             file_path = this_anime_dict['file_path']
             file_dir = os.path.dirname(file_path)
             final_path_2 = os.path.join(file_dir, final_name_2)
@@ -288,12 +277,12 @@ class MyWidget(QtWidgets.QWidget):
             b_cn_name = this_anime_dict['b_cn_name']
             print(f"{b_cn_name}重命名成功")
 
-    # 鼠标进入同时，检测对象是否为 URL 并允许拖放
+    # 鼠标进入，检测是否为 URL 并允许拖放
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():
             event.acceptProposedAction()
 
-    # 鼠标松手以后，在 tree 中展示文件路径，并写入 file_path_exist 列表
+    # 鼠标松手，在 tree 中展示文件路径，写入 file_path_exist 路径列表
     def dropEvent(self, event):
         raw_path_list = event.mimeData().urls()
         for raw_path in raw_path_list:
@@ -304,21 +293,22 @@ class MyWidget(QtWidgets.QWidget):
             if file_path.endswith('/'):
                 file_path = file_path[:-1]
 
-            # 判断是文件夹还是文件
-            if os.path.isdir(file_path):
-                file_name = os.path.basename(file_path)
-                # 是否存在相同文件夹
-                if file_path not in self.file_path_exist:
-                    # 写入动画路径列表,用于识别去重
-                    self.file_path_exist.append(file_path)
-
-                    # 显示在 tree 中
-                    this_column = QtWidgets.QTreeWidgetItem([str(self.list_id), file_name])
-                    self.tree.addTopLevelItem(this_column)
-                    print(f"新增了{file_name}")
-
-                    self.list_id += 1
-                else:
-                    print(f"{file_name}已存在")
-            else:
+            # 过滤非文件夹
+            if not os.path.isdir(file_path):
                 print(f"已过滤文件{file_path}")
+                return
+
+            # 去重已存在的文件夹
+            file_name = os.path.basename(file_path)
+            if file_path in self.file_path_exist:
+                print(f"{file_name}已存在")
+                return
+
+            # 写入动画路径列表
+            self.file_path_exist.append(file_path)
+
+            # 显示在 tree 中
+            this_column = QtWidgets.QTreeWidgetItem([str(self.list_id), file_name])
+            self.tree.addTopLevelItem(this_column)
+            print(f"新增了{file_name}")
+            self.list_id += 1
