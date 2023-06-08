@@ -128,13 +128,25 @@ class MyWidget(QtWidgets.QWidget):
     # 显示选中动画的详情
     @QtCore.Slot()
     def show_select_list(self, current):
-        # 根据选中的行数索引计算 list_id
         select_order = self.tree.indexOfTopLevelItem(current)
-        list_id = select_order + 1
-        list_count = len(self.anime_list)
+        order_count = len(self.anime_list)
 
-        # 选中的行是否已经分析过并写入列表
-        if list_id <= list_count:
+        # 选中了未分析的项目
+        if order_count <= select_order:
+            self.info_jp_name.setText("动画：")
+            self.info_cn_name.setText("中文名：")
+            self.b_initial_name.setText("动画系列：")
+            self.info_type.setText("动画类型：")
+            self.info_release_date.setText("放送日期：")
+            self.info_file_name.setText("文件名：")
+            self.info_final_name.setText("重命名结果：")
+            pixmap = QtGui.QPixmap("img/default.png")
+            pixmap = pixmap.scaledToWidth(142)
+            self.image.setPixmap(pixmap)
+            return
+
+        # 选中行是否存在 b_initial_id 证明分析完成
+        if "b_initial_id" in self.anime_list[select_order]:
             b_jp_name = self.anime_list[select_order]["b_jp_name"]
             self.info_jp_name.setText(f"动画：{b_jp_name}")
 
@@ -202,7 +214,7 @@ class MyWidget(QtWidgets.QWidget):
         self.anime_list = sorted(self.anime_list, key=lambda x: x['list_id'])
 
         # 展示在列表中
-        # 如果没有 b_initial_id 说明没执行到最后一步
+        # 如果没有 b_initial_id 说明没分析完成
         if "b_initial_id" in this_anime_dict:
             list_id = this_anime_dict["list_id"]
             list_order = list_id - 1

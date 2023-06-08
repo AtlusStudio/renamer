@@ -1,10 +1,1 @@
-array_of_dicts = [{'list_id': 1, 'file_name': '[Deadmau- RAWS] Pandora.Hearts.S01.Specials.2009.X264.AC3.DVDRip-AVC.Deadmauvlad', 'file_path': '/Users/akko/Downloads/[Deadmau- RAWS] Pandora.Hearts.S01.Specials.2009.X264.AC3.DVDRip-AVC.Deadmauvlad', 'romaji_name': 'Pandora.Hearts.S01.Specials.2009.X264.AC3.DVDRip-AVC.Deadmauvlad'}, {'list_id': 3, 'file_name': '[Moozzi2] Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e S2 [ x265-10Bit Ver. ] - TV + SP', 'file_path': '/Users/akko/Downloads/[Moozzi2] Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e S2 [ x265-10Bit Ver. ] - TV + SP', 'romaji_name': 'Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e S2', 'a_jp_name': 'ようこそ実力至上主義の教室へ 2nd Season', 'a_type': 'TV', 'b_id': 371546, 'b_jp_name': 'ようこそ実力至上主義の教室へ 2nd Season', 'b_cn_name': '欢迎来到实力至上主义教室 第二季', 'b_image': 'http://lain.bgm.tv/pic/cover/l/c8/8a/371546_Df9ri.jpg', 'b_type': 'TV', 'b_release_date': '220704', 'b_episodes': 13, 'b_initial_id': '214272', 'b_initial_name': '欢迎来到实力至上主义教室', 'b_image_name': '371546_Df9ri.jpg', 'final_name': '欢迎来到实力至上主义教室 第二季/[01] [220704] ようこそ実力至上主義の教室へ 2nd Season'}, {'list_id': 2, 'file_name': '[Moozzi2] Watashi ni Tenshi ga Maiorita! Precious Friends [ x265-10Bit Ver. ] - Movie + SP', 'file_path': '/Users/akko/Downloads/[Moozzi2] Watashi ni Tenshi ga Maiorita! Precious Friends [ x265-10Bit Ver. ] - Movie + SP', 'romaji_name': 'Watashi ni Tenshi ga Maiorita! Precious Friends', 'a_jp_name': '私に天使が舞い降りた！プレシャス・フレンズ', 'a_type': 'MOVIE', 'b_id': 320493, 'b_jp_name': '私に天使が舞い降りた！プレシャス・フレンズ', 'b_cn_name': '天使降临到了我身边！Precious Friends', 'b_image': 'http://lain.bgm.tv/pic/cover/l/16/73/320493_mMG4Z.jpg', 'b_type': '剧场版', 'b_release_date': '221014', 'b_episodes': 1, 'b_initial_id': '249637', 'b_initial_name': '天使降临到了我身边！', 'b_image_name': '320493_mMG4Z.jpg', 'final_name': '天使降临到了我身边！Precious Friends/[02] [221014] 私に天使が舞い降りた！プレシャス・フレンズ'}]
-
-
-havename = []
-
-for index, dictionary in enumerate(array_of_dicts):
-    if "final_name" in dictionary:
-        havename.append(index)
-
-print("字典中含有\"filename\"键的索引:", havename)
+[{"name": "John", "id": 1}, {"name": "John", "id": 1}, {"id": 1}, {"name": "Jane"}]
