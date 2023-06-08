@@ -13,13 +13,14 @@ class MyWidget(QtWidgets.QWidget):
         super().__init__()
         self.setWindowTitle("Bangumi Renamer")
         self.resize(1000, -1)
-        # self.setFixedSize(self.size())  # 禁止拉伸窗口
+        # self.setFixedSize(self.size())    # 禁止拉伸窗口
         self.setAcceptDrops(True)
         self.setup_ui()
+        self.connect_signals()              # 连接信号
 
-        self.anime_list = []        # 动画列表，存入所有数据
-        self.file_path_exist = []   # 动画路径列表（仅用于对比是否存在相同项目）
-        self.list_id = 1            # ID 计数器
+        self.anime_list = []                # 动画列表，存入所有数据
+        self.file_path_exist = []           # 动画路径列表（仅用于对比是否存在相同项目）
+        self.list_id = 1                    # ID 计数器
 
     def setup_ui(self) -> None:
         self.tree = QtWidgets.QTreeWidget(self)
@@ -122,7 +123,9 @@ class MyWidget(QtWidgets.QWidget):
     # 打印列表
     @QtCore.Slot()
     def print_list(self):
-        self.state.setText("00")
+        print("55")
+        emitter = function.SignalEmitter()
+        function.update_label_text(emitter)
 
     # 显示选中动画的详情
     @QtCore.Slot()
@@ -328,3 +331,9 @@ class MyWidget(QtWidgets.QWidget):
             self.tree.addTopLevelItem(this_column)
             print(f"新增了{file_name}")
             self.list_id += 1
+
+    def connect_signals(self):
+        emitter = function.SignalEmitter()
+        emitter.label_changed.connect(self.state.setText)
+        print("50")
+
