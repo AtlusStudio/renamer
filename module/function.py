@@ -117,6 +117,7 @@ def get_anime_info(list_id, file_path):
 
     return this_anime_dict
 
+
 # 获取命名结果
 def get_final_name(this_anime_dict):
     b_initial_name = this_anime_dict["b_initial_name"]
@@ -127,6 +128,7 @@ def get_final_name(this_anime_dict):
     rename_style = "{b_initial_name}/[{b_type}] [{b_release_date}] {b_jp_name}"
     final_name = eval(f'f"{rename_style}"')  # 保留 string 输出
     return final_name
+
 
 # 格式化 b_type
 def format_type(b_type):
@@ -141,10 +143,3 @@ def format_type(b_type):
         b_type = "XBD"
         print("不兼容的动画类型")
     return b_type
-
-
-
-# file_path = "/Users/akko/Downloads/[Moozzi2] Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e S2 [ x265-10Bit Ver. ] - TV + SP"
-# list_id = 5
-# result = get_anime_info(list_id, file_path)
-# print(result)

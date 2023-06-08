@@ -2,6 +2,7 @@ import os
 import arrow
 import threading
 import shutil
+import logging
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from module import function
@@ -15,6 +16,8 @@ class MyWidget(QtWidgets.QWidget):
         # self.setFixedSize(self.size())  # 禁止拉伸窗口
         self.setAcceptDrops(True)
         self.setup_ui()
+
+        self.lol = 20
 
         self.anime_list = []        # 动画列表，存入所有数据
         self.file_path_exist = []   # 动画路径列表（仅用于对比是否存在相同项目）
@@ -121,9 +124,7 @@ class MyWidget(QtWidgets.QWidget):
     # 打印列表
     @QtCore.Slot()
     def print_list(self):
-        print(f"anime_list: {self.anime_list}")
-        print(f"file_path_exist: {self.file_path_exist}")
-        self.state.setText(str(self.anime_list))
+        self.akko("lol")
 
     # 显示选中动画的详情
     @QtCore.Slot()
@@ -265,8 +266,9 @@ class MyWidget(QtWidgets.QWidget):
                 print(final_name_1)
                 print(final_name_2)
             else:
-                final_name_1 = final_name
-                print(final_name_1)
+                final_name_1 = ""
+                final_name_2 = final_name
+                print(final_name_2)
 
             # 更名当前文件夹
             file_path = this_anime_dict['file_path']
@@ -274,20 +276,29 @@ class MyWidget(QtWidgets.QWidget):
             final_path_2 = os.path.join(file_dir, final_name_2)
             os.rename(file_path, final_path_2)
 
-            # 创建父文件夹
-            final_path_1 = os.path.join(file_dir, final_name_1)
-            if not os.path.exists(final_path_1):
-                os.makedirs(final_path_1)
+            # 存在父文件夹则转移至父文件夹
+            if final_name_1 != "":
+                # 创建父文件夹
+                final_path_1 = os.path.join(file_dir, final_name_1)
+                if not os.path.exists(final_path_1):
+                    os.makedirs(final_path_1)
 
-            # 修改 / 为当前系统下的正确分隔符
-            separator = os.path.sep
-            final_name = final_name.replace('/', separator)
+                # 修改 / 为当前系统下的正确分隔符
+                separator = os.path.sep
+                final_name = final_name.replace('/', separator)
 
-            # 移动至父文件夹
-            final_path = os.path.join(file_dir, final_name)
-            shutil.move(final_path_2, final_path)
-            b_cn_name = this_anime_dict['b_cn_name']
-            print(f"{b_cn_name}重命名成功")
+                # 移动至父文件夹
+                final_path = os.path.join(file_dir, final_name)
+                shutil.move(final_path_2, final_path)
+                b_cn_name = this_anime_dict['b_cn_name']
+                print(f"{b_cn_name}重命名成功")
+
+    # 记录日志
+    def akko(self, content, window=False, log=False):
+        print(f"{content}")
+        logging.basicConfig(level=logging.INFO)
+        logging.info(f"{content}")
+        self.state.setText("505")
 
     # 鼠标进入，检测是否为 URL 并允许拖放
     def dragEnterEvent(self, event):

@@ -1,0 +1,2 @@
+2023-06-08 19:49:36,627 - root - INFO - lol-akko
+2023-06-08 19:49:37,455 - root - INFO - lol-akko
