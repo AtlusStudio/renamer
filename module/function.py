@@ -1,8 +1,28 @@
 import os
 import re
 import requests
+from PyQt6.QtCore import QObject, pyqtSignal
 
 from module import api
+
+
+
+
+    # # 记录日志
+    # @QtCore.Slot()
+    # def akko(self, content, window=False, log=False):
+    #     function.update_label_text(emitter)
+    #     print(f"{content}")
+    #     logging.basicConfig(level=logging.INFO)
+    #     logging.info(f"{content}")
+    #     self.state.setText("505")
+
+
+
+
+
+
+
 
 
 # 正则提取文件夹的罗马名
@@ -25,6 +45,7 @@ def get_romaji_name(file_name):
         return romaji_name
     else:
         return
+
 
 # 获取动画信息
 def get_anime_info(list_id, file_path):

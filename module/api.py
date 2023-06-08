@@ -45,6 +45,7 @@ def anilist(romaji_name):
             retry += 1
     print(f"在Anilist中搜索{romaji_name}失败")
 
+
 # 向 Bangumi Search 请求数据(search/subject/keywords)
 # https://bangumi.github.io/api/
 def bangumi_search(a_jp_name):
@@ -79,6 +80,7 @@ def bangumi_search(a_jp_name):
             time.sleep(0.5)
             retry += 1
     print(f"在Bangumi中搜索{a_jp_name}失败")
+
 
 # 向 Bangumi Subject 请求数据(/v0/subjects/subject_id)
 # https://bangumi.github.io/api/
