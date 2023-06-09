@@ -2,7 +2,7 @@ import os
 import arrow
 import threading
 import shutil
-import logging
+import time
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from module import function
@@ -87,13 +87,13 @@ class MyWidget(QtWidgets.QWidget):
 
         # self.tree.topLevelItem(1).setText(4, "MainWindow")  # 更改内容
 
-        self.state = QtWidgets.QLabel("等待拖入文件", self)
+        self.state = QtWidgets.QLabel("请拖入文件夹", self)
         self.state.setMinimumWidth(400)
         self.state.setMaximumWidth(4000)
 
         self.btn_clear = QtWidgets.QPushButton("清空列表", self)
         self.btn_clear.setFixedWidth(100)
-        self.btn_clear.clicked.connect(self.print_list)
+        self.btn_clear.clicked.connect(self.clear_list)
 
         self.btn_analysis = QtWidgets.QPushButton("开始识别", self)
         self.btn_analysis.setFixedWidth(100)
@@ -121,8 +121,12 @@ class MyWidget(QtWidgets.QWidget):
 
     # 打印列表
     @QtCore.Slot()
-    def print_list(self):
-        print("55")
+    def clear_list(self):
+        self.anime_list = []                # 重置动画列表
+        self.file_path_exist = []           # 重置动画路径列表
+        self.list_id = 1                    # 重置 ID 计数器
+        self.tree.clear()                   # 清空列表
+        self.state.setText("内容已清空")
 
     # 显示选中动画的详情
     @QtCore.Slot()
@@ -191,7 +195,7 @@ class MyWidget(QtWidgets.QWidget):
     def start_analysis(self):
         # 路径列表是否为空
         if not self.file_path_exist:
-            print("请先拖入文件夹")
+            self.state.setText("请先拖入文件夹")
             return
 
         # 分析过程
@@ -201,7 +205,7 @@ class MyWidget(QtWidgets.QWidget):
             # 在单独的线程中运行get_anime_info函数
             thread = threading.Thread(target=self.start_analysis_thread, args=(list_id, file_path))
             thread.start()
-            self.state.setText(f"开始识别{list_id}个动画")
+            self.state.setText(f"开始识别{list_id}个动画项目，请稍等")
             list_id += 1
 
     # 开始分析线程
@@ -294,6 +298,9 @@ class MyWidget(QtWidgets.QWidget):
             b_cn_name = this_anime_dict['b_cn_name']
             print(f"{b_cn_name}重命名成功")
 
+        # 输出结果
+        self.state.setText("重命名完成")
+
     # 鼠标进入，检测是否为 URL 并允许拖放
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():
@@ -311,21 +318,22 @@ class MyWidget(QtWidgets.QWidget):
                 file_path = file_path[:-1]
 
             # 过滤非文件夹
-            if not os.path.isdir(file_path):
+            if os.path.isdir(file_path):
+                # 去重已存在的文件夹
+                file_name = os.path.basename(file_path)
+                if file_path not in self.file_path_exist:
+                    # 写入动画路径列表
+                    self.file_path_exist.append(file_path)
+
+                    # 显示在 tree 中
+                    this_column = QtWidgets.QTreeWidgetItem([str(self.list_id), file_name])
+                    self.tree.addTopLevelItem(this_column)
+                    print(f"新增了{file_name}")
+
+                    # 更新数量信息
+                    self.state.setText(f"当前有{self.list_id}个动画项目")
+                    self.list_id += 1
+                else:
+                    print(f"{file_name}已存在")
+            else:
                 print(f"已过滤文件{file_path}")
-                return
-
-            # 去重已存在的文件夹
-            file_name = os.path.basename(file_path)
-            if file_path in self.file_path_exist:
-                print(f"{file_name}已存在")
-                return
-
-            # 写入动画路径列表
-            self.file_path_exist.append(file_path)
-
-            # 显示在 tree 中
-            this_column = QtWidgets.QTreeWidgetItem([str(self.list_id), file_name])
-            self.tree.addTopLevelItem(this_column)
-            print(f"新增了{file_name}")
-            self.list_id += 1
