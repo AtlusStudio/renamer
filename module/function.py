@@ -1,18 +1,9 @@
 import os
 import re
 import requests
-from PyQt6.QtCore import QObject, pyqtSignal
 
 from module import api
 
-
-class SignalEmitter(QObject):
-    label_changed = pyqtSignal(str)
-
-
-def update_label_text(emitter):
-    new_text = "新的文本"
-    emitter.label_changed.emit(new_text)
 
 
     # # 记录日志
