@@ -5,22 +5,13 @@ import requests
 from module import api
 
 
-
-    # # 记录日志
-    # @QtCore.Slot()
-    # def akko(self, content, window=False, log=False):
-    #     function.update_label_text(emitter)
-    #     print(f"{content}")
-    #     logging.basicConfig(level=logging.INFO)
-    #     logging.info(f"{content}")
-    #     self.state.setText("505")
-
-
-
-
-
-
-
+# # 记录日志
+# def akko(self, content, window=False, log=False):
+#     function.update_label_text(emitter)
+#     print(f"{content}")
+#     logging.basicConfig(level=logging.INFO)
+#     logging.info(f"{content}")
+#     self.state.setText("505")
 
 
 # 正则提取文件夹的罗马名
