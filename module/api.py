@@ -105,8 +105,21 @@ def bangumi_subject(b_id):
             b_release_date = arrow.get(b_release_date).format("YYMMDD")  # 处理时间格式
             b_episodes = result["eps"]
 
+            # 格式化 b_type
+            b_type = b_type.lower()
+            if b_type in ["tv"]:
+                b_typecode = "01"
+            elif b_type in ["剧场版"]:
+                b_typecode = "02"
+            elif b_type in ["ova", "oad"]:
+                b_typecode = "03"
+            else:
+                b_typecode = "XBD"
+                print("不兼容的动画类型")
+
             b_dict = dict()
             b_dict["b_type"] = b_type
+            b_dict["b_typecode"] = b_typecode
             b_dict["b_release_date"] = b_release_date
             b_dict["b_episodes"] = b_episodes
             return b_dict

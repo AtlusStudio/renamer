@@ -131,25 +131,11 @@ def get_anime_info(list_id, file_path):
 # 获取命名结果
 def get_final_name(this_anime_dict):
     b_initial_name = this_anime_dict["b_initial_name"]
-    b_type = format_type(this_anime_dict["b_type"])  # 格式化 b_type 显示类型
+    b_type = this_anime_dict["b_type"]
+    b_typecode = this_anime_dict["b_typecode"]
     b_release_date = this_anime_dict["b_release_date"]
     b_jp_name = this_anime_dict["b_jp_name"]
 
-    rename_style = "{b_initial_name}/[{b_type}] [{b_release_date}] {b_jp_name}"
+    rename_style = "{b_initial_name}/[{b_typecode}] [{b_release_date}] {b_jp_name}"
     final_name = eval(f'f"{rename_style}"')  # 保留 string 输出
     return final_name
-
-
-# 格式化 b_type
-def format_type(b_type):
-    b_type = b_type.lower()
-    if b_type in ["tv"]:
-        b_type = "01"
-    elif b_type in ["剧场版"]:
-        b_type = "02"
-    elif b_type in ["ova", "oad"]:
-        b_type = "03"
-    else:
-        b_type = "XBD"
-        print("不兼容的动画类型")
-    return b_type
