@@ -1,4 +1,5 @@
 import os
+import re
 import arrow
 import threading
 import shutil
@@ -14,17 +15,19 @@ class MyWidget(QtWidgets.QWidget):
         self.resize(1000, -1)
         # self.setFixedSize(self.size())    # 禁止拉伸窗口
         self.setAcceptDrops(True)
-
-        self.anime_list = []                # 动画列表，存入所有数据
-        self.file_path_exist = []           # 动画路径列表（仅用于对比是否存在相同项目）
-        self.list_id = 1                    # ID 计数器
-
         self.setup_ui()
+
+        self.anime_list = []        # 动画列表，存入所有数据
+        self.file_path_exist = []   # 动画路径列表（仅用于对比是否存在相同项目）
+        self.list_id = 1            # ID 计数器
 
     def setup_ui(self) -> None:
         self.type_label = QtWidgets.QLabel("命名格式：", self)
         self.type_input = QtWidgets.QLineEdit(self)
-        self.type_confirm = QtWidgets.QPushButton("保存并应用", self)
+        self.type_how = QtWidgets.QPushButton("格式指南", self)
+        self.type_how.setFixedWidth(100)
+        self.type_how.clicked.connect(self.show_type_doc)
+        self.type_confirm = QtWidgets.QPushButton("检查格式并保存", self)
         self.type_confirm.setFixedWidth(100)
         self.type_confirm.clicked.connect(self.save_config)
         self.load_text()  # 读取配置
@@ -34,6 +37,7 @@ class MyWidget(QtWidgets.QWidget):
         self.type_container.setLayout(self.type_layout)     # 添加内容到子布局
         self.type_layout.addWidget(self.type_label)
         self.type_layout.addWidget(self.type_input)
+        self.type_layout.addWidget(self.type_how)
         self.type_layout.addWidget(self.type_confirm)
 
         self.tree = QtWidgets.QTreeWidget(self)
@@ -77,9 +81,9 @@ class MyWidget(QtWidgets.QWidget):
         self.info_final_name = QtWidgets.QLabel("重命名结果：", self)
         self.info_final_name.setMaximumWidth(4000)
 
-        self.label_layout = QtWidgets.QVBoxLayout(self)         # 创建子布局：文本标签
-        self.label_container = QtWidgets.QWidget()              # 创建子布局控件
-        self.label_container.setLayout(self.label_layout)       # 添加内容到子布局
+        self.label_layout = QtWidgets.QVBoxLayout(self)     # 创建子布局：文本标签
+        self.label_container = QtWidgets.QWidget()          # 创建子布局控件
+        self.label_container.setLayout(self.label_layout)   # 添加内容到子布局
         self.label_layout.addWidget(self.info_jp_name)
         self.label_layout.addWidget(self.info_cn_name)
         self.label_layout.addWidget(self.b_initial_name)
@@ -89,9 +93,9 @@ class MyWidget(QtWidgets.QWidget):
         self.label_layout.addWidget(self.info_file_name)
         self.label_layout.addWidget(self.info_final_name)
 
-        self.info_layout = QtWidgets.QHBoxLayout(self)          # 创建子布局：动画信息
-        self.info_container = QtWidgets.QWidget()               # 创建子布局控件
-        self.info_container.setLayout(self.info_layout)         # 添加内容到子布局
+        self.info_layout = QtWidgets.QHBoxLayout(self)      # 创建子布局：动画信息
+        self.info_container = QtWidgets.QWidget()           # 创建子布局控件
+        self.info_container.setLayout(self.info_layout)     # 添加内容到子布局
         self.info_layout.addWidget(self.image)
         self.info_layout.addWidget(self.label_container)
 
@@ -117,9 +121,9 @@ class MyWidget(QtWidgets.QWidget):
         self.btn_rename.setFixedWidth(100)
         self.btn_rename.clicked.connect(self.start_rename)
 
-        self.btn_layout = QtWidgets.QHBoxLayout(self)           # 创建子布局
-        self.btn_container = QtWidgets.QWidget()                # 创建子布局控件
-        self.btn_container.setLayout(self.btn_layout)           # 添加内容到子布局
+        self.btn_layout = QtWidgets.QHBoxLayout(self)       # 创建子布局
+        self.btn_container = QtWidgets.QWidget()            # 创建子布局控件
+        self.btn_container.setLayout(self.btn_layout)       # 添加内容到子布局
         self.btn_layout.addWidget(self.state)
         self.btn_layout.addStretch()
         self.btn_layout.addWidget(self.btn_clear)
@@ -136,9 +140,31 @@ class MyWidget(QtWidgets.QWidget):
 
     # 保存配置
     def save_config(self):
-        text = self.type_input.text()
+        input_text = self.type_input.text()
+
+        # 花括号内容是否合规
+        work_type = ["b_id", "romaji_name", "b_jp_name", "b_cn_name", "b_initial_name", "b_type", "b_typecode",
+                         "b_release_date", "b_episodes"]
+        pattern = r"\{(.*?)\}"
+        matches = re.findall(pattern, input_text)
+        for match in matches:
+            if match not in work_type:
+                self.warning_dialog("不支持的格式变量，请检查花括号内容")
+                return
+
+        # 花括号是否成对
+        if not function.check_braces(input_text):
+            self.warning_dialog("花括号结构有误，请检查")
+            return
+
+        # 是否有多个斜杠
+        if input_text.count("/") > 1:
+            self.warning_dialog("最多支持一个父文件夹嵌套")
+            return
+
+        # 写入配置
         settings = QtCore.QSettings("config.ini", QtCore.QSettings.IniFormat)
-        settings.setValue("type", text)
+        settings.setValue("type", input_text)
 
     # 读取配置
     def load_text(self):
@@ -147,20 +173,47 @@ class MyWidget(QtWidgets.QWidget):
 
         # 如果不存在配置文件，则创建
         if not config_file.exists():
-            open(config_file.filePath(), "w").write("")                                     # 创建配置文件，并写入空内容
-            name_type = "{b_initial_name}/[{b_typecode}] [{b_release_date}] {b_jp_name}"    # 默认格式
+            open(config_file.filePath(), "w").write("")  # 创建配置文件，并写入空内容
+            name_type = "{b_initial_name}/[{b_typecode}] [{b_release_date}] {b_jp_name}"  # 默认格式
             settings.setValue("type", name_type)
 
-        text = settings.value("type", "")
-        self.type_input.setText(str(text))
+        input_text = settings.value("type", "")
+        self.type_input.setText(str(input_text))
+
+    # 警告对话框
+    def warning_dialog(self, message):
+        dialog = QtWidgets.QMessageBox(self)
+        dialog.setWindowTitle("命名格式错误")
+        dialog.setText(f"命名格式错误：<br>{message}")
+        dialog.setIcon(QtWidgets.QMessageBox.Warning)
+        dialog.exec()
+
+    # 命名指南对话框
+    def show_type_doc(self):
+        dialog = QtWidgets.QMessageBox(self)
+        dialog.setWindowTitle("格式指南")
+        dialog.setText("格式变量请使用花括号 { } 引用<br>"
+                       "父文件夹请使用斜杠 / 分割，仅支持单层父文件夹<br><br>"
+                       "{b_id}：Bangumi Subject ID<br>"
+                       "{romaji_name}：动画罗马名<br>"
+                       "{b_jp_name}：动画日文原名<br>"
+                       "{b_cn_name}：动画中文译名<br>"
+                       "{b_initial_name}：第一季度的中文译名<br>"
+                       "{b_type}：动画类型（TV、剧场版、OVA、OAD）<br>"
+                       "{b_typecode}：动画类型代码（01：TV、02：剧场版、03：OVA与OAD）<br>"
+                       "{b_release_date}：动画放送日期<br>"
+                       "{b_episodes}：动画集数（当前季）<br><br>"
+                       "注意：完成修改后请重新分析")
+        dialog.setIcon(QtWidgets.QMessageBox.Question)
+        dialog.exec()
 
     # 打印列表
     @QtCore.Slot()
     def clear_list(self):
-        self.anime_list = []                # 重置动画列表
-        self.file_path_exist = []           # 重置动画路径列表
-        self.list_id = 1                    # 重置 ID 计数器
-        self.tree.clear()                   # 清空列表
+        self.anime_list = []        # 重置动画列表
+        self.file_path_exist = []   # 重置动画路径列表
+        self.list_id = 1            # 重置 ID 计数器
+        self.tree.clear()           # 清空列表
         self.state.setText("内容已清空")
 
     # 显示选中动画的详情

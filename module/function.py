@@ -5,6 +5,24 @@ import requests
 from module import api
 
 
+# 检查花括号是否匹配
+def check_braces(string):
+    stack = []
+    for char in string:
+        if char == '{':
+            stack.append(char)
+        elif char == '}':
+            if len(stack) == 0 or stack[-1] != '{':
+                return False
+            else:
+                stack.pop()
+
+    if len(stack) == 0:
+        return True
+    else:
+        return False
+
+
 # 正则提取文件夹的罗马名
 def get_romaji_name(file_name):
     # 加载文件名忽略列表
@@ -121,11 +139,15 @@ def get_anime_info(list_id, file_path, name_type):
 
 # 获取命名结果
 def get_final_name(this_anime_dict, name_type):
+    b_id = this_anime_dict["b_id"]
+    romaji_name = this_anime_dict["romaji_name"]
+    b_jp_name = this_anime_dict["b_jp_name"]
+    b_cn_name = this_anime_dict["b_cn_name"]
     b_initial_name = this_anime_dict["b_initial_name"]
     b_type = this_anime_dict["b_type"]
     b_typecode = this_anime_dict["b_typecode"]
     b_release_date = this_anime_dict["b_release_date"]
-    b_jp_name = this_anime_dict["b_jp_name"]
+    b_episodes = this_anime_dict["b_episodes"]
 
     final_name = eval(f'f"{name_type}"')  # 保留 string 输出
     return final_name
