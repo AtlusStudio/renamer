@@ -165,6 +165,7 @@ class MyWidget(QtWidgets.QWidget):
         # 写入配置
         settings = QtCore.QSettings("config.ini", QtCore.QSettings.IniFormat)
         settings.setValue("type", input_text)
+        self.success_dialog("配置已保存<br>请重新分析后再开始重命名")
 
     # 读取配置
     def load_text(self):
@@ -183,9 +184,17 @@ class MyWidget(QtWidgets.QWidget):
     # 警告对话框
     def warning_dialog(self, message):
         dialog = QtWidgets.QMessageBox(self)
-        dialog.setWindowTitle("命名格式错误")
+        dialog.setWindowTitle("格式错误")
         dialog.setText(f"命名格式错误：<br>{message}")
         dialog.setIcon(QtWidgets.QMessageBox.Warning)
+        dialog.exec()
+
+    # 成功对话框
+    def success_dialog(self, message):
+        dialog = QtWidgets.QMessageBox(self)
+        dialog.setWindowTitle("保存成功")
+        dialog.setText(message)
+        dialog.setIcon(QtWidgets.QMessageBox.Information)
         dialog.exec()
 
     # 命名指南对话框
