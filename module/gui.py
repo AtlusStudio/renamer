@@ -7,11 +7,12 @@ from PySide6 import QtCore, QtGui, QtWidgets
 
 from module import function
 
+version = "v0.1"
 
 class MyWidget(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Bangumi Renamer")
+        self.setWindowTitle(f"Bangumi Renamer {version}")
         self.resize(1000, -1)
         # self.setFixedSize(self.size())    # 禁止拉伸窗口
         self.setAcceptDrops(True)
