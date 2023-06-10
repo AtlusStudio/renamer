@@ -2,7 +2,6 @@ import os
 import arrow
 import threading
 import shutil
-import time
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from module import function
@@ -20,8 +19,18 @@ class MyWidget(QtWidgets.QWidget):
         self.anime_list = []                # 动画列表，存入所有数据
         self.file_path_exist = []           # 动画路径列表（仅用于对比是否存在相同项目）
         self.list_id = 1                    # ID 计数器
+        self.name_type = "{b_initial_name}/[{b_typecode}] [{b_release_date}] {b_jp_name}"  # 默认命名格式
 
     def setup_ui(self) -> None:
+        self.type_label = QtWidgets.QLabel("命名格式：", self)
+        self.type_input = QtWidgets.QLineEdit(self)
+
+        self.type_layout = QtWidgets.QHBoxLayout(self)      # 创建子布局：文本标签
+        self.type_container = QtWidgets.QWidget()           # 创建子布局控件
+        self.type_container.setLayout(self.type_layout)     # 添加内容到子布局
+        self.type_layout.addWidget(self.type_label)
+        self.type_layout.addWidget(self.type_input)
+
         self.tree = QtWidgets.QTreeWidget(self)
         self.tree.setFixedHeight(260)
         self.tree.setColumnCount(5)
@@ -114,6 +123,7 @@ class MyWidget(QtWidgets.QWidget):
 
         # 添加布局
         self.layout = QtWidgets.QVBoxLayout(self)
+        self.layout.addWidget(self.type_container)
         self.layout.addWidget(self.tree)
         self.layout.addWidget(self.infobox)
         self.layout.addWidget(self.btn_container)
@@ -203,15 +213,15 @@ class MyWidget(QtWidgets.QWidget):
         list_id = 1
         for file_path in self.file_path_exist:
             # 在单独的线程中运行get_anime_info函数
-            thread = threading.Thread(target=self.start_analysis_thread, args=(list_id, file_path))
+            thread = threading.Thread(target=self.start_analysis_thread, args=(list_id, file_path, self.name_type))
             thread.start()
             self.state.setText(f"开始识别{list_id}个动画项目，请稍等")
             list_id += 1
 
     # 开始分析线程
-    def start_analysis_thread(self, list_id, file_path):
+    def start_analysis_thread(self, list_id, file_path, name_type):
         # 获取本线程的动画信息，写入 anime_list
-        this_anime_dict = function.get_anime_info(list_id, file_path)
+        this_anime_dict = function.get_anime_info(list_id, file_path, name_type)
         self.anime_list.append(this_anime_dict)
 
         # 重新排序 anime_list 列表，避免串行

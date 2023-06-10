@@ -14,6 +14,11 @@ from module import api
 #     self.state.setText("505")
 
 
+# 检查配置文件
+def check_config():
+    config_file = 'config.ini'
+
+
 # 正则提取文件夹的罗马名
 def get_romaji_name(file_name):
     # 加载文件名忽略列表
@@ -37,7 +42,7 @@ def get_romaji_name(file_name):
 
 
 # 获取动画信息
-def get_anime_info(list_id, file_path):
+def get_anime_info(list_id, file_path, name_type):
     this_anime_dict = dict()
 
     # 写入 ID
@@ -121,7 +126,7 @@ def get_anime_info(list_id, file_path):
         file.write(response_img.content)
 
     # 写入命名结果
-    final_name = get_final_name(this_anime_dict)
+    final_name = get_final_name(this_anime_dict, name_type)
     this_anime_dict["final_name"] = final_name
     print(f"该动画将重命名为{final_name}")
 
@@ -129,13 +134,12 @@ def get_anime_info(list_id, file_path):
 
 
 # 获取命名结果
-def get_final_name(this_anime_dict):
+def get_final_name(this_anime_dict, name_type):
     b_initial_name = this_anime_dict["b_initial_name"]
     b_type = this_anime_dict["b_type"]
     b_typecode = this_anime_dict["b_typecode"]
     b_release_date = this_anime_dict["b_release_date"]
     b_jp_name = this_anime_dict["b_jp_name"]
 
-    rename_style = "{b_initial_name}/[{b_typecode}] [{b_release_date}] {b_jp_name}"
-    final_name = eval(f'f"{rename_style}"')  # 保留 string 输出
+    final_name = eval(f'f"{name_type}"')  # 保留 string 输出
     return final_name
