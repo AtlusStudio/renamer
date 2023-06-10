@@ -304,7 +304,7 @@ class MyWidget(QtWidgets.QWidget):
             # 在单独的线程中运行get_anime_info函数
             thread = threading.Thread(target=self.start_analysis_thread, args=(list_id, file_path, name_type))
             thread.start()
-            self.state.setText(f"开始识别{list_id}个动画项目，请稍等")
+            # self.state.setText(f"准备识别{list_id}个动画项目")
             list_id += 1
 
     # 开始分析线程
