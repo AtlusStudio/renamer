@@ -14,22 +14,27 @@ class MyWidget(QtWidgets.QWidget):
         self.resize(1000, -1)
         # self.setFixedSize(self.size())    # 禁止拉伸窗口
         self.setAcceptDrops(True)
-        self.setup_ui()
 
         self.anime_list = []                # 动画列表，存入所有数据
         self.file_path_exist = []           # 动画路径列表（仅用于对比是否存在相同项目）
         self.list_id = 1                    # ID 计数器
-        self.name_type = "{b_initial_name}/[{b_typecode}] [{b_release_date}] {b_jp_name}"  # 默认命名格式
+
+        self.setup_ui()
 
     def setup_ui(self) -> None:
         self.type_label = QtWidgets.QLabel("命名格式：", self)
         self.type_input = QtWidgets.QLineEdit(self)
+        self.type_confirm = QtWidgets.QPushButton("保存并应用", self)
+        self.type_confirm.setFixedWidth(100)
+        self.type_confirm.clicked.connect(self.save_config)
+        self.load_text()  # 读取配置
 
         self.type_layout = QtWidgets.QHBoxLayout(self)      # 创建子布局：文本标签
         self.type_container = QtWidgets.QWidget()           # 创建子布局控件
         self.type_container.setLayout(self.type_layout)     # 添加内容到子布局
         self.type_layout.addWidget(self.type_label)
         self.type_layout.addWidget(self.type_input)
+        self.type_layout.addWidget(self.type_confirm)
 
         self.tree = QtWidgets.QTreeWidget(self)
         self.tree.setFixedHeight(260)
@@ -129,6 +134,26 @@ class MyWidget(QtWidgets.QWidget):
         self.layout.addWidget(self.btn_container)
         self.layout.addStretch()
 
+    # 保存配置
+    def save_config(self):
+        text = self.type_input.text()
+        settings = QtCore.QSettings("config.ini", QtCore.QSettings.IniFormat)
+        settings.setValue("type", text)
+
+    # 读取配置
+    def load_text(self):
+        config_file = QtCore.QFileInfo("config.ini")
+        settings = QtCore.QSettings("config.ini", QtCore.QSettings.IniFormat)
+
+        # 如果不存在配置文件，则创建
+        if not config_file.exists():
+            open(config_file.filePath(), "w").write("")                                     # 创建配置文件，并写入空内容
+            name_type = "{b_initial_name}/[{b_typecode}] [{b_release_date}] {b_jp_name}"    # 默认格式
+            settings.setValue("type", name_type)
+
+        text = settings.value("type", "")
+        self.type_input.setText(str(text))
+
     # 打印列表
     @QtCore.Slot()
     def clear_list(self):
@@ -203,6 +228,7 @@ class MyWidget(QtWidgets.QWidget):
     # 开始分析
     @QtCore.Slot()
     def start_analysis(self):
+        name_type = self.type_input.text()
         # 路径列表是否为空
         if not self.file_path_exist:
             self.state.setText("请先拖入文件夹")
@@ -213,7 +239,7 @@ class MyWidget(QtWidgets.QWidget):
         list_id = 1
         for file_path in self.file_path_exist:
             # 在单独的线程中运行get_anime_info函数
-            thread = threading.Thread(target=self.start_analysis_thread, args=(list_id, file_path, self.name_type))
+            thread = threading.Thread(target=self.start_analysis_thread, args=(list_id, file_path, name_type))
             thread.start()
             self.state.setText(f"开始识别{list_id}个动画项目，请稍等")
             list_id += 1

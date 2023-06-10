@@ -5,20 +5,6 @@ import requests
 from module import api
 
 
-# # 记录日志
-# def akko(self, content, window=False, log=False):
-#     function.update_label_text(emitter)
-#     print(f"{content}")
-#     logging.basicConfig(level=logging.INFO)
-#     logging.info(f"{content}")
-#     self.state.setText("505")
-
-
-# 检查配置文件
-def check_config():
-    config_file = 'config.ini'
-
-
 # 正则提取文件夹的罗马名
 def get_romaji_name(file_name):
     # 加载文件名忽略列表
