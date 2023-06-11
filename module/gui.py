@@ -22,8 +22,10 @@ class MyWidget(QWidget):
         super().__init__()
         self.setWindowTitle("Bangumi Renamer")
 
-        self.titleLabel = QLabel("title", self)
-        self.subtitleLabel = QLabel("subtitle", self)
+        self.titleLabel = QLabel("Bangumi Renamer", self)
+        self.titleLabel.setObjectName('titleLabel')
+        self.subtitleLabel = QLabel("极为先进的动画重命名工具", self)
+        self.subtitleLabel.setObjectName('subtitleLabel')
 
         self.documentButton = PushButton(
             self.tr('Documentation'), self, FluentIcon.DOCUMENT)
@@ -68,8 +70,7 @@ class MyWidget(QWidget):
         self.supportButton.setToolTip(self.tr('Support me'))
         self.feedbackButton.setToolTip(self.tr('Send feedback'))
 
-        self.titleLabel.setObjectName('titleLabel')
-        self.subtitleLabel.setObjectName('subtitleLabel')
+
 
 
 
