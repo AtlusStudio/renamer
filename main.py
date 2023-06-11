@@ -8,7 +8,7 @@ from module import gui
 if __name__ == "__main__":
     app = QApplication([])
     window = gui.MyWidget()
-    icon = QIcon("image/icon.png")
-    window.setWindowIcon(icon)
+    # icon = QIcon("image/icon.png")
+    # window.setWindowIcon(icon)
     window.show()
     sys.exit(app.exec())
