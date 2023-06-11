@@ -7,31 +7,28 @@ from PySide6 import QtCore, QtGui, QtWidgets
 
 from module import function
 
-version = "1.0"
-
 class MyWidget(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(f"Bangumi Renamer {version}")
+        self.setWindowTitle("Bangumi Renamer")
         self.resize(1000, -1)
-        # self.setFixedSize(self.size())    # 禁止拉伸窗口
         self.setAcceptDrops(True)
-        self.setup_ui()
+        # self.setFixedSize(self.size())    # 禁止拉伸窗口
 
         self.anime_list = []        # 动画列表，存入所有数据
-        self.file_path_exist = []   # 动画路径列表（仅用于对比是否存在相同项目）
+        self.file_path_exist = []   # 动画路径列表
         self.list_id = 1            # ID 计数器
 
-    def setup_ui(self) -> None:
         self.type_label = QtWidgets.QLabel("命名格式：", self)
         self.type_input = QtWidgets.QLineEdit(self)
+
         self.type_how = QtWidgets.QPushButton("格式指南", self)
         self.type_how.setFixedWidth(100)
         self.type_how.clicked.connect(self.show_type_doc)
+
         self.type_confirm = QtWidgets.QPushButton("检查格式并保存", self)
         self.type_confirm.setFixedWidth(100)
         self.type_confirm.clicked.connect(self.save_config)
-        self.load_text()  # 读取配置
 
         self.type_layout = QtWidgets.QHBoxLayout(self)      # 创建子布局：文本标签
         self.type_container = QtWidgets.QWidget()           # 创建子布局控件
@@ -53,7 +50,7 @@ class MyWidget(QtWidgets.QWidget):
         self.tree.setRootIsDecorated(False)  # 禁止展开树
         self.tree.currentItemChanged.connect(self.show_select_list)
 
-        self.pixmap = QtGui.QPixmap("img/default.png")
+        self.pixmap = QtGui.QPixmap("image/default.png")
         self.pixmap = self.pixmap.scaledToWidth(142)
 
         self.image = QtWidgets.QLabel(self)
@@ -139,13 +136,16 @@ class MyWidget(QtWidgets.QWidget):
         self.layout.addWidget(self.btn_container)
         self.layout.addStretch()
 
+        # 读取配置
+        self.load_text()
+
     # 保存配置
     def save_config(self):
         input_text = self.type_input.text()
 
         # 花括号内容是否合规
         work_type = ["b_id", "romaji_name", "b_jp_name", "b_cn_name", "b_initial_name", "b_type", "b_typecode",
-                         "b_release_date", "b_episodes"]
+                     "b_release_date", "b_episodes"]
         pattern = r"\{(.*?)\}"
         matches = re.findall(pattern, input_text)
         for match in matches:
