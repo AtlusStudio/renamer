@@ -1,11 +1,45 @@
+MyWidget {
+    background: #FAFAFA;
+}
+
 #titleLabel {
-    font: 28px 'Segoe UI SemiBold', 'Microsoft YaHei';
-    background-color: transparent;
-    color: black;
+    font-size: 28px;
+    color: #000;
 }
 
 #subtitleLabel {
-    font: 12px 'Segoe UI', 'Microsoft YaHei';
-    background-color: transparent;
-    color: rgb(95, 95, 95);
+    font-size: 13px;
+    color: #666;
+}
+
+#tableFrame {
+    background: #F5F5F5;
+    border: 1px solid #EDEDED;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+#infoFrame {
+    background: #FFF;
+    border: 1px solid #EDEDED;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+#cnLabel {
+    font-size: 20px;
+    color: #000;
+}
+
+#jpLabel {
+    font-size: 13px;
+    color: #666;
+}
+
+#image0 {
+    border-radius: 8px;
+}
+
+#separator {
+    background: #EDEDED;
 }

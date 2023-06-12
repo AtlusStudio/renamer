@@ -7,76 +7,166 @@ from PySide6 import QtCore, QtGui, QtWidgets
 from module import function
 
 
-
-
 from PySide6.QtCore import Qt, Signal, QUrl, QEvent
-from PySide6.QtGui import QDesktopServices, QPainter, QPen, QColor
-from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame
+from PySide6.QtGui import QDesktopServices, QPainter, QPen, QColor, QPixmap
+from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame, QTableWidgetItem
 
-from qfluentwidgets import (ScrollArea, PushButton, ToolButton, FluentIcon,
-                            isDarkTheme, IconWidget, Theme, ToolTipFilter)
+from qfluentwidgets import setThemeColor, PushButton, ToolButton, TableWidget, PrimaryPushButton
+from qfluentwidgets import FluentIcon as Icon
 
 
 class MyWidget(QWidget):
     def __init__(self):
         super().__init__()
+        setThemeColor("#F09199")
         self.setWindowTitle("Bangumi Renamer")
+        self.resize(1000, 720)
+        self.setAcceptDrops(True)
+        # self.setFixedSize(self.size())  # 禁止拉伸窗口
 
         self.titleLabel = QLabel("Bangumi Renamer", self)
-        self.titleLabel.setObjectName('titleLabel')
+        self.titleLabel.setObjectName("titleLabel")
         self.subtitleLabel = QLabel("极为先进的动画重命名工具", self)
         self.subtitleLabel.setObjectName('subtitleLabel')
 
-        self.documentButton = PushButton(
-            self.tr('Documentation'), self, FluentIcon.DOCUMENT)
-        self.sourceButton = PushButton(self.tr('Source'), self, FluentIcon.GITHUB)
-        self.themeButton = ToolButton(FluentIcon.CONSTRACT, self)
+        self.table = TableWidget(self)
+        self.table.setObjectName("tableIt")
+        self.table.verticalHeader().hide()
+        self.table.setColumnCount(5)
+        self.table.setRowCount(1)
+        self.table.setHorizontalHeaderLabels(["ID", "文件名", "动画名（本季）", "动画名（首季）", "重命名"])
+        self.table.setColumnWidth(0, 36)  # 928
+        self.table.setColumnWidth(1, 200)
+        self.table.setColumnWidth(2, 180)
+        self.table.setColumnWidth(3, 180)
+        self.table.setColumnWidth(4, 330)
+        # self.table.resizeColumnsToContents()
 
-        self.supportButton = ToolButton(FluentIcon.HEART, self)
-        self.feedbackButton = ToolButton(FluentIcon.FEEDBACK, self)
+        self.table.insertRow(1)
+        self.table.setItem(1, 0, QTableWidgetItem("1"))
+        self.table.setItem(1, 1, QTableWidgetItem("文件名文件名文件名文件名文件名"))
+        self.table.setItem(1, 2, QTableWidgetItem("动画名动画名动画名动画名"))
+        self.table.insertRow(1)
+        self.table.setItem(1, 0, QTableWidgetItem("1"))
+        self.table.setItem(1, 1, QTableWidgetItem("文件名文件名文件名文件名文件名"))
+        self.table.setItem(1, 2, QTableWidgetItem("动画名动画名动画名动画名"))
+
+        self.pixmap = QPixmap("image/empty.png")
+        self.pixmap = self.pixmap.scaledToWidth(142)
+        self.image = QLabel(self)
+        self.image.setMinimumSize(150, 210)
+        self.image.setMaximumSize(150, 210)
+        self.image.setPixmap(self.pixmap)
+
+        self.cnLabel = QLabel("澳门永利礼享", self)
+        self.cnLabel.setObjectName("cnLabel")
+        self.jpLabel = QLabel("澳门永利礼享", self)
+        self.jpLabel.setObjectName("jpLabel")
+
+        self.editButton = ToolButton(Icon.EDIT, self)
+        self.linkButton = ToolButton(Icon.LINK, self)
+
+        self.separator = QFrame()
+        self.separator.setObjectName("separator")
+        self.separator.setMinimumHeight(1)
+        self.separator.setMaximumHeight(1)
+
+        self.typeLabel = QLabel("类型：", self)
+        self.typeLabel.setObjectName("typeLabel")
+        self.dateLabel = QLabel("放送日期：", self)
+        self.dateLabel.setObjectName("dateLabel")
+        self.fileNameLabel = QLabel("文件名：", self)
+        self.fileNameLabel.setObjectName("fileNameLabel")
+        self.finalNameLabel = QLabel("重命名结果：", self)
+        self.finalNameLabel.setObjectName("finalNameLabel")
+
+        self.settingButton = PushButton("格式设置", self)
+        self.settingButton.setFixedWidth(120)
+        self.analysisButton = PushButton("开始分析", self)
+        self.analysisButton.setFixedWidth(120)
+        self.renameButton = PrimaryPushButton("重命名", self)
+        self.renameButton.setFixedWidth(120)
+
+        self.__initLayout()
+
+    def __initLayout(self):
+        self.tableLayout = QHBoxLayout()
+        self.tableLayout.setSpacing(0)
+        self.tableLayout.setContentsMargins(0, 8, 0, 0)
+        self.tableLayout.addWidget(self.table)
+
+        self.tableFrame = QFrame()
+        self.tableFrame.setObjectName("tableFrame")
+        self.tableFrame.setLayout(self.tableLayout)
+
+        self.nameLayout = QVBoxLayout()
+        self.nameLayout.setSpacing(8)
+        self.nameLayout.setContentsMargins(0, 0, 0, 0)
+        self.nameLayout.addSpacing(10)
+        self.nameLayout.addWidget(self.cnLabel)
+        self.nameLayout.addWidget(self.jpLabel)
+
+        self.titleLayout = QHBoxLayout()
+        self.titleLayout.setSpacing(12)
+        self.titleLayout.setContentsMargins(0, 0, 0, 0)
+        self.titleLayout.addLayout(self.nameLayout, 0)
+        self.titleLayout.addStretch(1)
+        self.titleLayout.addWidget(self.editButton)
+        self.titleLayout.addWidget(self.linkButton)
+        self.titleLayout.addSpacing(12)
+
+        self.detailLayout = QVBoxLayout()
+        self.detailLayout.setSpacing(8)
+        self.detailLayout.setContentsMargins(0, 0, 0, 0)
+        self.detailLayout.addLayout(self.titleLayout, 0)
+        self.detailLayout.addSpacing(8)
+        self.detailLayout.addWidget(self.separator)
+        self.detailLayout.addSpacing(8)
+        self.detailLayout.addWidget(self.typeLabel)
+        self.detailLayout.addWidget(self.dateLabel)
+        self.detailLayout.addWidget(self.fileNameLabel)
+        self.detailLayout.addWidget(self.finalNameLabel)
+        self.detailLayout.addStretch(1)
+
+        self.infoLayout = QHBoxLayout()
+        # self.infoLayout.setAlignment(Qt.AlignTop)
+        self.infoLayout.setSpacing(12)
+        self.infoLayout.setContentsMargins(16, 16, 16, 16)
+        self.infoLayout.setObjectName("infoLayout")
+        self.infoLayout.addWidget(self.image)
+        self.infoLayout.addLayout(self.detailLayout, 0)
+
+        self.infoFrame = QFrame(self)
+        self.infoFrame.setObjectName("infoFrame")
+        self.infoFrame.setLayout(self.infoLayout)
+        self.infoFrame.setMaximumHeight(242)
+
+        self.buttonLayout = QHBoxLayout()
+        # self.buttonLayout.setAlignment(Qt.AlignTop)
+        self.buttonLayout.setSpacing(12)
+        self.buttonLayout.setContentsMargins(0, 0, 0, 0)
+        self.buttonLayout.setObjectName("infoLayout")
+        self.buttonLayout.addWidget(self.settingButton)
+        self.buttonLayout.addStretch(1)
+        self.buttonLayout.addWidget(self.analysisButton)
+        self.buttonLayout.addWidget(self.renameButton)
+
+        self.buttonFrame = QFrame(self)
+        self.buttonFrame.setObjectName("buttonFrame")
+        self.buttonFrame.setLayout(self.buttonLayout)
 
         self.vBoxLayout = QVBoxLayout(self)
-        self.buttonLayout = QHBoxLayout()
-
-        self.__initWidget()
-
-    def __initWidget(self):
-        self.setFixedHeight(138)
+        # self.infoLayout.setAlignment(Qt.AlignTop)
         self.vBoxLayout.setSpacing(0)
-        self.vBoxLayout.setContentsMargins(36, 22, 36, 12)
-        self.vBoxLayout.addWidget(self.titleLabel)
+        self.vBoxLayout.setContentsMargins(36, 24, 36, 24)
+        self.vBoxLayout.addWidget(self.titleLabel, 0, Qt.AlignTop)
         self.vBoxLayout.addSpacing(4)
-        self.vBoxLayout.addWidget(self.subtitleLabel)
-        self.vBoxLayout.addSpacing(4)
-        self.vBoxLayout.addLayout(self.buttonLayout, 1)
-        self.vBoxLayout.setAlignment(Qt.AlignTop)
-
-        self.buttonLayout.setSpacing(4)
-        self.buttonLayout.setContentsMargins(0, 0, 0, 0)
-        self.buttonLayout.addWidget(self.documentButton, 0, Qt.AlignLeft)
-        self.buttonLayout.addWidget(self.sourceButton, 0, Qt.AlignLeft)
-        self.buttonLayout.addStretch(1)
-        self.buttonLayout.addWidget(self.themeButton, 0, Qt.AlignRight)
-
-        self.buttonLayout.addWidget(self.supportButton, 0, Qt.AlignRight)
-        self.buttonLayout.addWidget(self.feedbackButton, 0, Qt.AlignRight)
-        self.buttonLayout.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
-
-        self.themeButton.installEventFilter(ToolTipFilter(self.themeButton))
-        self.supportButton.installEventFilter(ToolTipFilter(self.supportButton))
-        self.feedbackButton.installEventFilter(
-            ToolTipFilter(self.feedbackButton))
-        self.themeButton.setToolTip(self.tr('Toggle theme'))
-        self.supportButton.setToolTip(self.tr('Support me'))
-        self.feedbackButton.setToolTip(self.tr('Send feedback'))
-
-
-
-
-
-
-
-
+        self.vBoxLayout.addWidget(self.subtitleLabel, 0, Qt.AlignTop)
+        self.vBoxLayout.addSpacing(24)
+        self.vBoxLayout.addWidget(self.tableFrame, 0)
+        self.vBoxLayout.addWidget(self.infoFrame, 0)
+        self.vBoxLayout.addSpacing(24)
+        self.vBoxLayout.addWidget(self.buttonFrame, 0)
 
 
 

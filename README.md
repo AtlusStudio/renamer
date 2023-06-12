@@ -1,6 +1,7 @@
-<p align="center" style="margin: 40px auto">
+<p align="center">
     <img src="image/logo.svg" width=60%/ alt="">
 </p>
+
 
 
 ## 介绍

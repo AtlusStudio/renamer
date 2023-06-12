@@ -1,31 +1,31 @@
-import re
+from PySide6.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem
 
+app = QApplication([])
 
-def check_braces(string):
-    stack = []
+# 创建主窗口
+window = QMainWindow()
 
-    for char in string:
-        if char == '{':
-            stack.append(char)
-        elif char == '}':
-            if len(stack) == 0 or stack[-1] != '{':
-                return False
-            else:
-                stack.pop()
+# 创建表格
+table = QTableWidget(window)
 
-    if len(stack) == 0:
-        return True
-    else:
-        return False
+# 添加数据和行列
+table.setRowCount(3)
+table.setColumnCount(2)
 
+# 向表格添加内容
+table.setItem(0, 0, QTableWidgetItem("行1列1"))
+table.setItem(0, 1, QTableWidgetItem("行1列2"))
+table.setItem(1, 0, QTableWidgetItem("行2列1"))
+table.setItem(1, 1, QTableWidgetItem("行2列2"))
+table.setItem(2, 0, QTableWidgetItem("行3列1"))
+table.setItem(2, 1, QTableWidgetItem("行3列2"))
 
-# 示例用法
-string1 = 'Hello {world}（{{}}0{}'
-string2 = 'Hello {world'
-string3 = 'Hello} world{'
-string4 = 'Hello {world}'
+# 插入新行
+table.insertRow(1)
+table.setItem(1, 0, QTableWidgetItem("新行列1"))
+table.setItem(1, 1, QTableWidgetItem("新行列2"))
 
-print(check_braces(string1))  # 输出：False
-print(check_braces(string2))  # 输出：False
-print(check_braces(string3))  # 输出：False
-print(check_braces(string4))  # 输出：True
+window.setCentralWidget(table)
+window.show()
+
+app.exec()
