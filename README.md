@@ -1,10 +1,12 @@
-<p align="center">
-    <img src="icon/icon.png" width=25%/ alt="">
+<p align="center" style="margin-bottom: 20px">
+    <img src="image/logo.svg" width=75%/ alt="">
 </p>
 
 ## 介绍
 
-本项目是基于 AniList 与 Bangumi 极为先进的自动化命名工具。只需要拖入下载完成的动画文件夹，即可根据自定义规则重新命名，避免手动整理费神又费力。
+本项目是基于 AniList 与 Bangumi 极为先进的自动化命名工具。只需要拖入下载完成的动画文件夹，就能根据自定义规则重新命名，免去手动整理费神又费力。
+
+**本工具仅作用于动画文件夹**。视频文件命名已经有很多成熟的自动化方案了，故不再重复提供。
 
 ## 示例
 
@@ -56,7 +58,7 @@ Bangumi Renamer 具备简单 GUI 界面，批量拖入需要更名的文件夹�
 
 ##### 数据来源：
 
-- `AniList`：对动画罗马名的第一搜索结果较为准确
+- `AniList`：对动画罗马名的第一搜索结果命中率极高
 - `Bangumi`：命名数据的主要来源
 
 ## TODO
