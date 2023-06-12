@@ -8,11 +8,11 @@ from module import function
 
 
 from PySide6.QtCore import Qt, Signal, QUrl, QEvent
-from PySide6.QtGui import QDesktopServices, QPainter, QPen, QColor, QPixmap
-from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame, QTableWidgetItem
+from PySide6.QtGui import QPixmap
+from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame, QTableWidgetItem, QAbstractItemView
 
-from qfluentwidgets import setThemeColor, PushButton, ToolButton, TableWidget, PrimaryPushButton
-from qfluentwidgets import FluentIcon as Icon
+from qfluentwidgets import setThemeColor, PushButton, ToolButton, TableWidget, PrimaryPushButton, FluentIcon
+from qfluentwidgets.common.style_sheet import styleSheetManager
 
 
 class MyWidget(QWidget):
@@ -26,30 +26,37 @@ class MyWidget(QWidget):
 
         self.titleLabel = QLabel("Bangumi Renamer", self)
         self.titleLabel.setObjectName("titleLabel")
-        self.subtitleLabel = QLabel("极为先进的动画重命名工具", self)
+        self.subtitleLabel = QLabel("略微先进的动画重命名工具", self)
         self.subtitleLabel.setObjectName('subtitleLabel')
 
         self.table = TableWidget(self)
-        self.table.setObjectName("tableIt")
-        self.table.verticalHeader().hide()
+        self.table.verticalHeader().hide()  # 隐藏左侧表头
+        self.table.horizontalHeader().setHighlightSections(False)  # 选中时表头不加粗
+        self.table.setSelectionMode(QAbstractItemView.SingleSelection)  # 单选模式
         self.table.setColumnCount(5)
-        self.table.setRowCount(1)
-        self.table.setHorizontalHeaderLabels(["ID", "文件名", "动画名（本季）", "动画名（首季）", "重命名"])
+        self.table.setRowCount(3)
+        self.table.setHorizontalHeaderLabels(["ID", "文件夹", "动画名（本季）", "动画名（首季）", "重命名"])
         self.table.setColumnWidth(0, 36)  # 928
         self.table.setColumnWidth(1, 200)
         self.table.setColumnWidth(2, 180)
         self.table.setColumnWidth(3, 180)
         self.table.setColumnWidth(4, 330)
         # self.table.resizeColumnsToContents()
+        styleSheetManager.deregister(self.table)  # 禁用皮肤，启用自定义 QSS
+        with open("style/table.qss", encoding="utf-8") as file:
+            self.table.setStyleSheet(file.read())
 
-        self.table.insertRow(1)
-        self.table.setItem(1, 0, QTableWidgetItem("1"))
+        self.table.setItem(0, 0, QTableWidgetItem("24"))
+        self.table.setItem(0, 1, QTableWidgetItem("文件名文件名文件名文件名文件名"))
+        self.table.setItem(0, 2, QTableWidgetItem("动画动画名动画名"))
+        self.table.setItem(0, 3, QTableWidgetItem("动画名动画名动名文件名画名动画名"))
+        self.table.setItem(0, 4, QTableWidgetItem("动画名动画名动名文件名名文件名画名动画名"))
+        self.table.setItem(1, 0, QTableWidgetItem("27"))
         self.table.setItem(1, 1, QTableWidgetItem("文件名文件名文件名文件名文件名"))
         self.table.setItem(1, 2, QTableWidgetItem("动画名动画名动画名动画名"))
-        self.table.insertRow(1)
-        self.table.setItem(1, 0, QTableWidgetItem("1"))
-        self.table.setItem(1, 1, QTableWidgetItem("文件名文件名文件名文件名文件名"))
-        self.table.setItem(1, 2, QTableWidgetItem("动画名动画名动画名动画名"))
+        self.table.setItem(2, 0, QTableWidgetItem("23"))
+        self.table.setItem(2, 1, QTableWidgetItem("文件名文件名文件名文件名文件名"))
+        self.table.setItem(2, 2, QTableWidgetItem("动画名动画名动画名动画名"))
 
         self.pixmap = QPixmap("image/empty.png")
         self.pixmap = self.pixmap.scaledToWidth(142)
@@ -63,8 +70,8 @@ class MyWidget(QWidget):
         self.jpLabel = QLabel("澳门永利礼享", self)
         self.jpLabel.setObjectName("jpLabel")
 
-        self.editButton = ToolButton(Icon.EDIT, self)
-        self.linkButton = ToolButton(Icon.LINK, self)
+        self.editButton = ToolButton(FluentIcon.EDIT, self)
+        self.linkButton = ToolButton(FluentIcon.LINK, self)
 
         self.separator = QFrame()
         self.separator.setObjectName("separator")
@@ -92,7 +99,7 @@ class MyWidget(QWidget):
     def __initLayout(self):
         self.tableLayout = QHBoxLayout()
         self.tableLayout.setSpacing(0)
-        self.tableLayout.setContentsMargins(0, 8, 0, 0)
+        self.tableLayout.setContentsMargins(0, 0, 0, 0)
         self.tableLayout.addWidget(self.table)
 
         self.tableFrame = QFrame()
@@ -129,7 +136,6 @@ class MyWidget(QWidget):
         self.detailLayout.addStretch(1)
 
         self.infoLayout = QHBoxLayout()
-        # self.infoLayout.setAlignment(Qt.AlignTop)
         self.infoLayout.setSpacing(12)
         self.infoLayout.setContentsMargins(16, 16, 16, 16)
         self.infoLayout.setObjectName("infoLayout")
@@ -142,7 +148,6 @@ class MyWidget(QWidget):
         self.infoFrame.setMaximumHeight(242)
 
         self.buttonLayout = QHBoxLayout()
-        # self.buttonLayout.setAlignment(Qt.AlignTop)
         self.buttonLayout.setSpacing(12)
         self.buttonLayout.setContentsMargins(0, 0, 0, 0)
         self.buttonLayout.setObjectName("infoLayout")
@@ -156,7 +161,6 @@ class MyWidget(QWidget):
         self.buttonFrame.setLayout(self.buttonLayout)
 
         self.vBoxLayout = QVBoxLayout(self)
-        # self.infoLayout.setAlignment(Qt.AlignTop)
         self.vBoxLayout.setSpacing(0)
         self.vBoxLayout.setContentsMargins(36, 24, 36, 24)
         self.vBoxLayout.addWidget(self.titleLabel, 0, Qt.AlignTop)

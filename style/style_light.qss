@@ -36,10 +36,6 @@ MyWidget {
     color: #666;
 }
 
-#image0 {
-    border-radius: 8px;
-}
-
 #separator {
     background: #EDEDED;
 }
