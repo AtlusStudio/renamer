@@ -1,31 +1,35 @@
-from PySide6.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem
+import sys
+from PySide6.QtCore import Qt, Signal
+from PySide6.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton
+from test2 import Calculator
 
-app = QApplication([])
 
-# 创建主窗口
-window = QMainWindow()
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Calculator")
+        self.setGeometry(100, 100, 300, 200)
 
-# 创建表格
-table = QTableWidget(window)
+        self.label = QLabel("Result: ", self)
+        self.label.setGeometry(20, 20, 260, 30)
 
-# 添加数据和行列
-table.setRowCount(3)
-table.setColumnCount(2)
+        self.input_box = QLineEdit(self)
+        self.input_box.setGeometry(20, 60, 180, 30)
 
-# 向表格添加内容
-table.setItem(0, 0, QTableWidgetItem("行1列1"))
-table.setItem(0, 1, QTableWidgetItem("行1列2"))
-table.setItem(1, 0, QTableWidgetItem("行2列1"))
-table.setItem(1, 1, QTableWidgetItem("行2列2"))
-table.setItem(2, 0, QTableWidgetItem("行3列1"))
-table.setItem(2, 1, QTableWidgetItem("行3列2"))
+        self.calculate_button = QPushButton("Calculate", self)
+        self.calculate_button.setGeometry(20, 100, 80, 30)
 
-# 插入新行
-table.insertRow(1)
-table.setItem(1, 0, QTableWidgetItem("新行列1"))
-table.setItem(1, 1, QTableWidgetItem("新行列2"))
+        self.calculator = Calculator(self.input_box)
+        self.calculator.result_calculated.connect(self.update_label)
 
-window.setCentralWidget(table)
-window.show()
+        self.calculate_button.clicked.connect(self.calculator.calculate)
 
-app.exec()
+    def update_label(self, result):
+        self.label.setText(f"Result: {result}")
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec())

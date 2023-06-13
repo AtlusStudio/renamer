@@ -3,16 +3,14 @@ import re
 import arrow
 import threading
 import shutil
-from PySide6 import QtCore, QtGui, QtWidgets
-from module import function
 
-
-from PySide6.QtCore import Qt, Signal, QUrl, QEvent
-from PySide6.QtGui import QPixmap
+from PySide6.QtCore import Qt, Signal, QUrl, QEvent, QMimeData
+from PySide6.QtGui import QPixmap, QDragEnterEvent, QDropEvent
 from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame, QTableWidgetItem, QAbstractItemView
-
 from qfluentwidgets import setThemeColor, PushButton, ToolButton, TableWidget, PrimaryPushButton, FluentIcon
 from qfluentwidgets.common.style_sheet import styleSheetManager
+
+from module.function import *
 
 
 class MyWidget(QWidget):
@@ -24,6 +22,9 @@ class MyWidget(QWidget):
         self.setAcceptDrops(True)
         # self.setFixedSize(self.size())  # 禁止拉伸窗口
 
+        self.list_id = 0
+        self.anime_list = []
+
         self.titleLabel = QLabel("Bangumi Renamer", self)
         self.titleLabel.setObjectName("titleLabel")
         self.subtitleLabel = QLabel("略微先进的动画重命名工具", self)
@@ -34,7 +35,6 @@ class MyWidget(QWidget):
         self.table.horizontalHeader().setHighlightSections(False)  # 选中时表头不加粗
         self.table.setSelectionMode(QAbstractItemView.SingleSelection)  # 单选模式
         self.table.setColumnCount(5)
-        self.table.setRowCount(3)
         self.table.setHorizontalHeaderLabels(["ID", "文件夹", "动画名（本季）", "动画名（首季）", "重命名"])
         self.table.setColumnWidth(0, 36)  # 928
         self.table.setColumnWidth(1, 200)
@@ -46,17 +46,11 @@ class MyWidget(QWidget):
         with open("style/table.qss", encoding="utf-8") as file:
             self.table.setStyleSheet(file.read())
 
-        self.table.setItem(0, 0, QTableWidgetItem("24"))
-        self.table.setItem(0, 1, QTableWidgetItem("文件名文件名文件名文件名文件名"))
-        self.table.setItem(0, 2, QTableWidgetItem("动画动画名动画名"))
-        self.table.setItem(0, 3, QTableWidgetItem("动画名动画名动名文件名画名动画名"))
-        self.table.setItem(0, 4, QTableWidgetItem("动画名动画名动名文件名名文件名画名动画名"))
-        self.table.setItem(1, 0, QTableWidgetItem("27"))
-        self.table.setItem(1, 1, QTableWidgetItem("文件名文件名文件名文件名文件名"))
-        self.table.setItem(1, 2, QTableWidgetItem("动画名动画名动画名动画名"))
-        self.table.setItem(2, 0, QTableWidgetItem("23"))
-        self.table.setItem(2, 1, QTableWidgetItem("文件名文件名文件名文件名文件名"))
-        self.table.setItem(2, 2, QTableWidgetItem("动画名动画名动画名动画名"))
+        # self.table.setItem(0, 0, QTableWidgetItem("24"))
+        # self.table.setItem(0, 1, QTableWidgetItem("文件名文件名文件名文件名文件名"))
+        # self.table.setItem(0, 2, QTableWidgetItem("动画动画名动画名"))
+        # self.table.setItem(0, 3, QTableWidgetItem("动画名动画名动名文件名画名动画名"))
+        # self.table.setItem(0, 4, QTableWidgetItem("动画名动画名动名文件名名文件名画名动画名"))
 
         self.pixmap = QPixmap("image/empty.png")
         self.pixmap = self.pixmap.scaledToWidth(142)
@@ -172,6 +166,26 @@ class MyWidget(QWidget):
         self.vBoxLayout.addSpacing(24)
         self.vBoxLayout.addWidget(self.buttonFrame, 0)
 
+    # 拖动文件进入窗口时被调用，并接受拖放操作
+    def dragEnterEvent(self, event):
+        event.acceptProposedAction()
+
+    # 文件放下时被调用，提取文件的本地路径
+    def dropEvent(self, event):
+        raw_path_list = event.mimeData().urls()
+        init_result = initAnimeList(self.list_id, self.anime_list, raw_path_list)
+
+        self.list_id = init_result[0]
+        self.anime_list = init_result[1]
+
+        # 显示在表格中
+        self.table.setRowCount(self.list_id)
+        for anime in self.anime_list:
+            list_id = anime["list_id"]
+            list_count = str(list_id + 1)
+            file_name = anime["file_name"]
+            self.table.setItem(list_id, 0, QTableWidgetItem(list_count))
+            self.table.setItem(list_id, 1, QTableWidgetItem(file_name))
 
 
 
@@ -186,7 +200,7 @@ class MyWidget(QWidget):
 
 
 
-#
+
 # class MyWidget(QtWidgets.QWidget):
 #     def __init__(self):
 #         super().__init__()
