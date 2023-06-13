@@ -21,6 +21,7 @@ MyWidget {
 
 #infoFrame {
     background: #FFF;
+    margin-top: -1px;
     border: 1px solid #EDEDED;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
