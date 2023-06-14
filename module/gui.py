@@ -7,7 +7,8 @@ import shutil
 from PySide6.QtCore import Qt, Signal, QUrl, QEvent, QMimeData
 from PySide6.QtGui import QPixmap, QDragEnterEvent, QDropEvent
 from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame, QTableWidgetItem, QAbstractItemView
-from qfluentwidgets import setThemeColor, PushButton, ToolButton, TableWidget, PrimaryPushButton, FluentIcon
+from qfluentwidgets import setThemeColor, PushButton, ToolButton, TableWidget, PrimaryPushButton, FluentIcon, InfoBar, \
+    InfoBarPosition
 from qfluentwidgets.common.style_sheet import styleSheetManager
 
 from module.function import *
@@ -27,7 +28,7 @@ class MyWidget(QWidget):
 
         self.titleLabel = QLabel("Bangumi Renamer", self)
         self.titleLabel.setObjectName("titleLabel")
-        self.subtitleLabel = QLabel("略微先进的动画重命名工具", self)
+        self.subtitleLabel = QLabel("略微先进的文件重命名工具", self)
         self.subtitleLabel.setObjectName('subtitleLabel')
 
         self.table = TableWidget(self)
@@ -83,6 +84,9 @@ class MyWidget(QWidget):
 
         self.settingButton = PushButton("格式设置", self)
         self.settingButton.setFixedWidth(120)
+        self.clearButton = PushButton("清空列表", self)
+        self.clearButton.setFixedWidth(120)
+        self.clearButton.clicked.connect(self.clearList)
         self.analysisButton = PushButton("开始分析", self)
         self.analysisButton.setFixedWidth(120)
         self.renameButton = PrimaryPushButton("重命名", self)
@@ -147,6 +151,7 @@ class MyWidget(QWidget):
         self.buttonLayout.setObjectName("infoLayout")
         self.buttonLayout.addWidget(self.settingButton)
         self.buttonLayout.addStretch(1)
+        self.buttonLayout.addWidget(self.clearButton)
         self.buttonLayout.addWidget(self.analysisButton)
         self.buttonLayout.addWidget(self.renameButton)
 
@@ -166,6 +171,19 @@ class MyWidget(QWidget):
         self.vBoxLayout.addSpacing(24)
         self.vBoxLayout.addWidget(self.buttonFrame, 0)
 
+    # 清空列表
+    def clearList(self):
+        if self.list_id == 0:
+            InfoBar.warning(title="", content="列表为空", orient=Qt.Horizontal, isClosable=True,
+                            position=InfoBarPosition.TOP, duration=1500, parent=self)
+            return
+        self.list_id = 0
+        self.anime_list = []
+        self.table.clearContents()
+        self.table.setRowCount(0)
+        InfoBar.success(title="", content="列表已清除", orient=Qt.Horizontal, isClosable=True,
+                        position=InfoBarPosition.TOP, duration=1500, parent=self)
+
     # 拖动文件进入窗口时被调用，并接受拖放操作
     def dragEnterEvent(self, event):
         event.acceptProposedAction()
@@ -175,7 +193,7 @@ class MyWidget(QWidget):
         raw_path_list = event.mimeData().urls()
         init_result = initAnimeList(self.list_id, self.anime_list, raw_path_list)
 
-        self.list_id = init_result[0]
+        self.list_id = init_result[0]  # 此处的 list_id 已经比实际加了 1
         self.anime_list = init_result[1]
 
         # 显示在表格中
@@ -186,20 +204,6 @@ class MyWidget(QWidget):
             file_name = anime["file_name"]
             self.table.setItem(list_id, 0, QTableWidgetItem(list_count))
             self.table.setItem(list_id, 1, QTableWidgetItem(file_name))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # class MyWidget(QtWidgets.QWidget):
 #     def __init__(self):

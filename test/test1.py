@@ -1,31 +1,35 @@
 import sys
-from PySide6.QtCore import Qt, Signal
-from PySide6.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton
-from test2 import Calculator
+from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QPushButton, QListWidget
+from test2 import add_column, clear_list
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Calculator")
+        self.setWindowTitle("GUI Program")
         self.setGeometry(100, 100, 300, 200)
 
-        self.label = QLabel("Result: ", self)
-        self.label.setGeometry(20, 20, 260, 30)
+        layout = QVBoxLayout()
+        central_widget = QWidget()
+        central_widget.setLayout(layout)
+        self.setCentralWidget(central_widget)
 
-        self.input_box = QLineEdit(self)
-        self.input_box.setGeometry(20, 60, 180, 30)
+        self.list_widget = QListWidget()
+        layout.addWidget(self.list_widget)
 
-        self.calculate_button = QPushButton("Calculate", self)
-        self.calculate_button.setGeometry(20, 100, 80, 30)
+        self.add_button = QPushButton("Add Column")
+        self.add_button.clicked.connect(self.add_column_clicked)
+        layout.addWidget(self.add_button)
 
-        self.calculator = Calculator(self.input_box)
-        self.calculator.result_calculated.connect(self.update_label)
+        self.clear_button = QPushButton("Clear List")
+        self.clear_button.clicked.connect(self.clear_list_clicked)
+        layout.addWidget(self.clear_button)
 
-        self.calculate_button.clicked.connect(self.calculator.calculate)
+    def add_column_clicked(self):
+        add_column(self.list_widget)
 
-    def update_label(self, result):
-        self.label.setText(f"Result: {result}")
+    def clear_list_clicked(self):
+        clear_list(self.list_widget)
 
 
 if __name__ == "__main__":
