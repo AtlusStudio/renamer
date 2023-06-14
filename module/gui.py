@@ -5,10 +5,10 @@ import threading
 import shutil
 
 from PySide6.QtCore import Qt, Signal, QUrl, QEvent, QMimeData
-from PySide6.QtGui import QPixmap, QDragEnterEvent, QDropEvent
+from PySide6.QtGui import QPixmap, QDragEnterEvent, QDropEvent, QPainter, QPainterPath
 from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame, QTableWidgetItem, QAbstractItemView
-from qfluentwidgets import setThemeColor, PushButton, ToolButton, TableWidget, PrimaryPushButton, FluentIcon, InfoBar, \
-    InfoBarPosition
+from qfluentwidgets import (setThemeColor, PushButton, ToolButton, TableWidget, PrimaryPushButton, FluentIcon,
+                            InfoBar, InfoBarPosition, PixmapLabel)
 from qfluentwidgets.common.style_sheet import styleSheetManager
 
 from module.function import *
@@ -28,7 +28,7 @@ class MyWidget(QWidget):
 
         self.titleLabel = QLabel("Bangumi Renamer", self)
         self.titleLabel.setObjectName("titleLabel")
-        self.subtitleLabel = QLabel("略微先进的文件重命名工具", self)
+        self.subtitleLabel = QLabel("略微先进的动画重命名工具", self)
         self.subtitleLabel.setObjectName('subtitleLabel')
 
         self.table = TableWidget(self)
@@ -47,22 +47,32 @@ class MyWidget(QWidget):
         with open("style/table.qss", encoding="utf-8") as file:
             self.table.setStyleSheet(file.read())
 
-        # self.table.setItem(0, 0, QTableWidgetItem("24"))
-        # self.table.setItem(0, 1, QTableWidgetItem("文件名文件名文件名文件名文件名"))
-        # self.table.setItem(0, 2, QTableWidgetItem("动画动画名动画名"))
-        # self.table.setItem(0, 3, QTableWidgetItem("动画名动画名动名文件名画名动画名"))
-        # self.table.setItem(0, 4, QTableWidgetItem("动画名动画名动名文件名名文件名画名动画名"))
+        # 加载图片
+        pixmap = QPixmap("image/empty.png")
+        pixmap = pixmap.scaled(150, 210, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.SmoothTransformation)
 
-        self.pixmap = QPixmap("image/empty.png")
-        self.pixmap = self.pixmap.scaledToWidth(142)
-        self.image = QLabel(self)
+        # 创建遮罩
+        rounded_pixmap = QPixmap(pixmap.size())
+        rounded_pixmap.fill(Qt.transparent)
+        mask = QPainterPath()
+        mask.addRoundedRect(pixmap.rect(), 10, 10)
+
+        # 绘制形状
+        painter = QPainter(rounded_pixmap)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setClipPath(mask)
+        painter.drawPixmap(0, 0, pixmap)
+        painter.end()
+
+        # 展示图片
+        self.image = QLabel()
         self.image.setMinimumSize(150, 210)
         self.image.setMaximumSize(150, 210)
-        self.image.setPixmap(self.pixmap)
+        self.image.setPixmap(rounded_pixmap)
 
-        self.cnLabel = QLabel("澳门永利礼享", self)
+        self.cnLabel = QLabel("暂无动画", self)
         self.cnLabel.setObjectName("cnLabel")
-        self.jpLabel = QLabel("澳门永利礼享", self)
+        self.jpLabel = QLabel("请先选中一个动画以展示详细信息", self)
         self.jpLabel.setObjectName("jpLabel")
 
         self.editButton = ToolButton(FluentIcon.EDIT, self)
@@ -89,6 +99,7 @@ class MyWidget(QWidget):
         self.clearButton.clicked.connect(self.clearList)
         self.analysisButton = PushButton("开始分析", self)
         self.analysisButton.setFixedWidth(120)
+        self.analysisButton.clicked.connect(self.startAnalysis)
         self.renameButton = PrimaryPushButton("重命名", self)
         self.renameButton.setFixedWidth(120)
 
@@ -171,18 +182,87 @@ class MyWidget(QWidget):
         self.vBoxLayout.addSpacing(24)
         self.vBoxLayout.addWidget(self.buttonFrame, 0)
 
+    # 信息提示
+    def infoMessage(self, typer, title, content):
+        if typer == "warning":
+            InfoBar.warning(title=title, content=content, orient=Qt.Horizontal, isClosable=True,
+                            position=InfoBarPosition.TOP, duration=1600, parent=self)
+        elif typer == "success":
+            InfoBar.success(title=title, content=content, orient=Qt.Horizontal, isClosable=True,
+                            position=InfoBarPosition.TOP, duration=1600, parent=self)
+
     # 清空列表
     def clearList(self):
+        # 列表中是否存在内容
         if self.list_id == 0:
-            InfoBar.warning(title="", content="列表为空", orient=Qt.Horizontal, isClosable=True,
-                            position=InfoBarPosition.TOP, duration=1500, parent=self)
+            self.infoMessage("warning", "清空失败", "列表中还没有内容哦")
+        else:
+            self.list_id = 0
+            self.anime_list = []
+            self.table.clearContents()
+            self.table.setRowCount(0)
+            self.infoMessage("success", "", "列表已清除")
+
+    # 开始分析
+    def startAnalysis(self):
+        # 路径列表是否为空
+        if not self.anime_list:
+            InfoBar.warning(title="分析失败", content="列表中还没有内容哦", orient=Qt.Horizontal, isClosable=True,
+                            position=InfoBarPosition.TOP, duration=1600, parent=self)
             return
-        self.list_id = 0
-        self.anime_list = []
-        self.table.clearContents()
-        self.table.setRowCount(0)
-        InfoBar.success(title="", content="列表已清除", orient=Qt.Horizontal, isClosable=True,
-                        position=InfoBarPosition.TOP, duration=1500, parent=self)
+
+        name_type = "{b_initial_name}/[{b_typecode}] [{b_release_date}] {b_jp_name}"
+        analysis_result = analysisAnimeList(self.anime_list, name_type)
+
+
+    #     # 开始分析
+    #     @QtCore.Slot()
+    #     def start_analysis(self):
+    #         name_type = self.type_input.text()
+    #         # 路径列表是否为空
+    #         if not self.file_path_exist:
+    #             self.state.setText("请先拖入文件夹")
+    #             return
+    #
+    #         # 分析过程
+    #         self.anime_list = []  # 重置动画列表
+    #         list_id = 1
+    #         for file_path in self.file_path_exist:
+    #             # 在单独的线程中运行get_anime_info函数
+    #             thread = threading.Thread(target=self.start_analysis_thread, args=(list_id, file_path, name_type))
+    #             thread.start()
+    #             # self.state.setText(f"准备识别{list_id}个动画项目")
+    #             list_id += 1
+    #
+    #     # 开始分析线程
+    #     def start_analysis_thread(self, list_id, file_path, name_type):
+    #         # 获取本线程的动画信息，写入 anime_list
+    #         this_anime_dict = function.get_anime_info(list_id, file_path, name_type)
+    #         self.anime_list.append(this_anime_dict)
+    #
+    #         # 重新排序 anime_list 列表，避免串行
+    #         self.anime_list = sorted(self.anime_list, key=lambda x: x['list_id'])
+    #
+    #         # 展示在列表中
+    #         # 如果没有 b_initial_id 说明没分析完成
+    #         if "b_initial_id" in this_anime_dict:
+    #             list_id = this_anime_dict["list_id"]
+    #             list_order = list_id - 1
+    #             file_name = this_anime_dict["file_name"]
+    #             b_cn_name = this_anime_dict["b_cn_name"]
+    #             b_initial_name = this_anime_dict["b_initial_name"]
+    #             final_name = this_anime_dict["final_name"]
+    #
+    #             self.tree.topLevelItem(list_order).setText(0, str(list_id))
+    #             self.tree.topLevelItem(list_order).setText(1, file_name)
+    #             self.tree.topLevelItem(list_order).setText(2, b_cn_name)
+    #             self.tree.topLevelItem(list_order).setText(3, b_initial_name)
+    #             self.tree.topLevelItem(list_order).setText(4, final_name)
+    #         else:
+    #             print("该动画未获取到内容，已跳过")
+
+
+
 
     # 拖动文件进入窗口时被调用，并接受拖放操作
     def dragEnterEvent(self, event):
@@ -415,14 +495,6 @@ class MyWidget(QWidget):
 #         dialog.setIcon(QtWidgets.QMessageBox.Question)
 #         dialog.exec()
 #
-#     # 打印列表
-#     @QtCore.Slot()
-#     def clear_list(self):
-#         self.anime_list = []        # 重置动画列表
-#         self.file_path_exist = []   # 重置动画路径列表
-#         self.list_id = 1            # 重置 ID 计数器
-#         self.tree.clear()           # 清空列表
-#         self.state.setText("内容已清空")
 #
 #     # 显示选中动画的详情
 #     @QtCore.Slot()

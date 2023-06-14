@@ -1,31 +1,33 @@
-import sys
-from PySide6.QtWidgets import QWidget, QApplication, QLineEdit, QMainWindow, QTextBrowser
+from PySide6.QtWidgets import QApplication, QLabel, QWidget
+from PySide6.QtGui import QPixmap, QPainter, QPainterPath, Qt
+from PySide6.QtCore import Qt, QSize
 
+app = QApplication([])
 
-class Window(QMainWindow):
-    def __init__(self):
-        super(Window, self).__init__()
-        self.paths = ""  # ==> 默认文本内容
-        self.setWindowTitle('文件拖入')  # ==> 窗口标题
-        self.resize(500, 400)  # ==> 定义窗口大小
-        self.textBrowser = QTextBrowser()
-        self.setCentralWidget(self.textBrowser)  # ==> 定义窗口主题内容为textBrowser
-        self.setAcceptDrops(True)  # ==> 设置窗口支持拖动（必须设置）
+# 加载图片
+pixmap = QPixmap("image/empty.png")
 
-    # 鼠标拖入事件
-    def dragEnterEvent(self, event):
-        self.setWindowTitle('dragEnterEvent')
-        file = event.mimeData().urls()[0].toLocalFile()  # ==> 获取文件路径
-        if file not in self.paths:  # ==> 去重显示
-            print("拖拽的文件 ==> {}".format(file))
-            self.paths += file + "\n"
-            self.textBrowser.setText(self.paths)
-            # 鼠标放开函数事件
-            event.accept()
+# 创建一个具有圆角的遮罩
+rounded_pixmap = QPixmap(pixmap.size())
+rounded_pixmap.fill(Qt.transparent)
 
+mask = QPainterPath()
+mask.addRoundedRect(rounded_pixmap.rect(), 8, 8)
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = Window()
-    window.show()
-    sys.exit(app.exec())
+painter = QPainter(rounded_pixmap)
+painter.setRenderHint(QPainter.Antialiasing)
+painter.setClipPath(mask)
+painter.drawPixmap(0, 0, pixmap)
+
+# 创建一个显示图片的标签
+label = QLabel()
+label.setPixmap(rounded_pixmap)
+
+# 创建一个窗口并显示标签
+window = QWidget()
+window.setWindowTitle("Rounded Image")
+window.setLayout(QVBoxLayout())
+window.layout().addWidget(label)
+window.show()
+
+app.exec()
