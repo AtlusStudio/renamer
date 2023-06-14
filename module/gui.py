@@ -4,7 +4,7 @@ import arrow
 import threading
 import shutil
 
-from PySide6.QtCore import Qt, Signal, QUrl, QEvent, QMimeData
+from PySide6.QtCore import Qt, Signal, QUrl, QEvent, QMimeData, QSize
 from PySide6.QtGui import QPixmap, QDragEnterEvent, QDropEvent, QPainter, QPainterPath
 from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame, QTableWidgetItem, QAbstractItemView
 from qfluentwidgets import (setThemeColor, PushButton, ToolButton, TableWidget, PrimaryPushButton, FluentIcon,
@@ -48,27 +48,33 @@ class MyWidget(QWidget):
             self.table.setStyleSheet(file.read())
 
         # 加载图片
-        pixmap = QPixmap("image/empty.png")
-        pixmap = pixmap.scaled(150, 210, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.SmoothTransformation)
+        pixmap = QPixmap("image/01.jpg")
 
-        # 创建遮罩
-        rounded_pixmap = QPixmap(pixmap.size())
-        rounded_pixmap.fill(Qt.transparent)
-        mask = QPainterPath()
-        mask.addRoundedRect(pixmap.rect(), 10, 10)
-
-        # 绘制形状
-        painter = QPainter(rounded_pixmap)
-        painter.setRenderHint(QPainter.Antialiasing)
-        painter.setClipPath(mask)
-        painter.drawPixmap(0, 0, pixmap)
-        painter.end()
+        # # 创建遮罩
+        # rounded_pixmap = QPixmap(QSize(400, 566))
+        # rounded_pixmap.fill(Qt.transparent)
+        # mask = QPainterPath()
+        # mask.addRoundedRect(pixmap.rect(), 10, 10)
+        # #
+        # # 绘制形状
+        # painter = QPainter(rounded_pixmap)
+        # painter.setRenderHint(QPainter.Antialiasing)
+        # painter.setClipPath(mask)
+        # painter.drawPixmap(0, 0, pixmap)
+        # painter.end()
 
         # 展示图片
         self.image = QLabel()
         self.image.setMinimumSize(150, 210)
         self.image.setMaximumSize(150, 210)
-        self.image.setPixmap(rounded_pixmap)
+        self.image.setPixmap(pixmap)
+        self.image.setScaledContents(True)
+        # 方法2：这个会使图片显示模糊
+        # jpg = QtGui.QPixmap("D:/PixivWallpaper/catavento.png").scaled(self.label.width(), self.label.height())
+        # self.label.setPixmap(jpg)
+
+
+
 
         self.cnLabel = QLabel("暂无动画", self)
         self.cnLabel.setObjectName("cnLabel")
@@ -145,7 +151,7 @@ class MyWidget(QWidget):
         self.detailLayout.addStretch(1)
 
         self.infoLayout = QHBoxLayout()
-        self.infoLayout.setSpacing(12)
+        self.infoLayout.setSpacing(16)
         self.infoLayout.setContentsMargins(16, 16, 16, 16)
         self.infoLayout.setObjectName("infoLayout")
         self.infoLayout.addWidget(self.image)
