@@ -1,9 +1,9 @@
 # Catch Imgs
-img/*.jpg
+image/*.jpg
 
 # PyCharm
 .idea
-
+# 
 # Byte-compiled / optimized / DLL files
 .DS_Store
 
