@@ -1,17 +1,11 @@
-import os
-import re
-import arrow
 import threading
-import shutil
 
-from PySide6.QtCore import Qt, Signal, QUrl, QEvent, QMimeData, QSize
-from PySide6.QtGui import QPixmap, QDragEnterEvent, QDropEvent, QPainter, QPainterPath
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame, QTableWidgetItem, QAbstractItemView
 from qfluentwidgets import (setThemeColor, PushButton, ToolButton, TableWidget, PrimaryPushButton, FluentIcon,
-                            InfoBar, InfoBarPosition, PixmapLabel)
+                            InfoBar, InfoBarPosition)
 from qfluentwidgets.common.style_sheet import styleSheetManager
-
-from module.function import *
 
 
 class MyWidget(QWidget):
@@ -44,7 +38,7 @@ class MyWidget(QWidget):
         self.table.setColumnWidth(4, 330)
         # self.table.resizeColumnsToContents()
         styleSheetManager.deregister(self.table)  # 禁用皮肤，启用自定义 QSS
-        with open("style/table.qss", encoding="utf-8") as file:
+        with open("src/style/table.qss", encoding="utf-8") as file:
             self.table.setStyleSheet(file.read())
 
         # 加载图片
@@ -573,21 +567,21 @@ class MyWidget(QWidget):
 #             self.state.setText("请先拖入文件夹")
 #             return
 #
-#         # 分析过程
-#         self.anime_list = []  # 重置动画列表
-#         list_id = 1
-#         for file_path in self.file_path_exist:
-#             # 在单独的线程中运行get_anime_info函数
-#             thread = threading.Thread(target=self.start_analysis_thread, args=(list_id, file_path, name_type))
-#             thread.start()
-#             # self.state.setText(f"准备识别{list_id}个动画项目")
-#             list_id += 1
-#
-#     # 开始分析线程
-#     def start_analysis_thread(self, list_id, file_path, name_type):
-#         # 获取本线程的动画信息，写入 anime_list
-#         this_anime_dict = function.get_anime_info(list_id, file_path, name_type)
-#         self.anime_list.append(this_anime_dict)
+        # 分析过程
+        self.anime_list = []  # 重置动画列表
+        list_id = 1
+        for file_path in self.file_path_exist:
+            # 在单独的线程中运行get_anime_info函数
+            thread = threading.Thread(target=self.start_analysis_thread, args=(list_id, file_path, name_type))
+            thread.start()
+            # self.state.setText(f"准备识别{list_id}个动画项目")
+            list_id += 1
+
+    # 开始分析线程
+    def start_analysis_thread(self, list_id, file_path, name_type):
+        # 获取本线程的动画信息，写入 anime_list
+        this_anime_dict = function.get_anime_info(list_id, file_path, name_type)
+        self.anime_list.append(this_anime_dict)
 #
 #         # 重新排序 anime_list 列表，避免串行
 #         self.anime_list = sorted(self.anime_list, key=lambda x: x['list_id'])

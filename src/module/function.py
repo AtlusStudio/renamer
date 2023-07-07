@@ -3,7 +3,7 @@ import re
 import requests
 from qfluentwidgets import InfoBar, InfoBarPosition
 
-from module import api
+from src.module import api
 
 
 def initAnimeList(list_id, anime_list, raw_path_list):
