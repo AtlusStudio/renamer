@@ -27,11 +27,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install pyinstaller
-
-    - name: Build (Windows)
-      if: ${{ runner.os == 'windows' }}
-      run: |
-        pyinstaller build.spec
         
     - name: Upload (Windows)
       if: ${{ runner.os == 'windows' }}
@@ -39,7 +34,7 @@ jobs:
       with:
         name: BangumiRenamer_windows
         path: |
-          dist/*
+          dist
           
     - name: Create Release and Upload Release Asset
       uses: release-drafter/release-drafter@v5
