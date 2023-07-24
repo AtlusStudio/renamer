@@ -1,12 +1,11 @@
 import requests
 import json
-import time     # 延迟操作
-import arrow    # 处理时间格式
+import time
 
 
-# 向 Anilist 请求数据
+# Anilist
 # https://anilist.github.io/ApiV2-GraphQL-Docs/
-def anilist(romaji_name):
+def anilistSearch(romaji_name):
     query = '''
     query ($id: String) {
         Media (search: $id, type: ANIME) {
@@ -17,149 +16,144 @@ def anilist(romaji_name):
         }
     }'''
 
-    js = {
-        'query': query,
-        'variables': {'id': romaji_name},
-    }
-
+    js = {"query": query, "variables": {"id": romaji_name}}
     headers = {'accept': 'application/json'}
-    print(f"正在通过Anilist搜索{romaji_name}")
+    url = "https://graphql.anilist.co"
+    print(f"1 ==> 搜索{romaji_name}")
 
-    retry = 0
-    while retry < 3:
-        response = requests.post('https://graphql.anilist.co', json=js, headers=headers)
+    for retry in range(3):
+        response = requests.post(url, json=js, headers=headers)
         if response.status_code == 200:
             result = json.loads(response.text.encode().decode('unicode_escape'))  # 特殊转码
-            print(f"成功获取到{romaji_name}的Anilist数据")
+            print(f"1 ==> 获取{romaji_name}数据")
 
-            a_jp_name = result["data"]["Media"]["title"]["native"]
-            a_type = result["data"]["Media"]["format"]
+            jp_name_anilist = result["data"]["Media"]["title"]["native"]
 
-            a_dict = dict()
-            a_dict["a_jp_name"] = a_jp_name
-            a_dict["a_type"] = a_type
-            return a_dict
+            return jp_name_anilist
         else:
-            print("Anilist请求失败，重试" + str(retry + 1))
             time.sleep(0.5)
-            retry += 1
-    print(f"在Anilist中搜索{romaji_name}失败")
+    print(f"1 ==> 搜索{romaji_name}失败")
 
 
-# 向 Bangumi Search 请求数据(search/subject/keywords)
+# Bangumi 搜索
 # https://bangumi.github.io/api/
-def bangumi_search(a_jp_name):
-    headers = {
-        'accept': 'application/json',
-        'User-Agent': 'nuthx/bangumi-renamer'
-    }
+def bangumiSearch(jp_name, season):
+    jp_name = jp_name.replace("!", "").replace("-", "")  # 搜索时移除特殊符号避免报错
 
-    url = "https://api.bgm.tv/search/subject/" + a_jp_name + "?type=2&responseGroup=small"
-    print(f"正在通过Bangumi搜索{a_jp_name}")
+    headers = {"accept": "application/json", "User-Agent": "nuthx/bangumi-renamer"}
+    url = "https://api.bgm.tv/search/subject/" + jp_name + "?type=2&responseGroup=large&max_results=25"
+    print(f"2 ==> 搜索{jp_name}")
 
-    retry = 0
-    while retry < 3:
+    for retry in range(3):
         response = requests.post(url, headers=headers)
         if response.status_code == 200:
             result = json.loads(response.text)
-            print(f"成功获取到{a_jp_name}的Bangumi数据")
+            print(f"2 ==> 获取{jp_name}数据")
 
-            b_id = result["list"][0]["id"]
-            b_jp_name = result["list"][0]["name"]
-            b_cn_name = result["list"][0]["name_cn"]
-            b_image = result["list"][0]["images"]["large"]
+            # 未搜索到内容停止
+            if "code" in result and result["code"] == 404:
+                return
 
-            b_dict = dict()
-            b_dict["b_id"] = b_id
-            b_dict["b_jp_name"] = b_jp_name
-            b_dict["b_cn_name"] = b_cn_name
-            b_dict["b_image"] = b_image
-            return b_dict
+            # 搜索当前季度
+            if season == 2:
+                return result["list"][0]["id"]
+
+            # 搜索第一季度
+            elif season == 1:
+                result_full = []
+                result_len = len(result['list'])
+
+                for i in range(result_len):
+                    # 跳过无日期的条目
+                    if result["list"][i]["air_date"] == "0000-00-00":
+                        continue
+
+                    # 跳过无内容的条目
+                    if result["list"][i]["name_cn"] == "":
+                        continue
+
+                    # 添加字典
+                    entry = {"bgm_id": result["list"][i]["id"],
+                             "cn_name": result["list"][i]["name_cn"],
+                             "release": result["list"][i]["air_date"]}
+                    result_full.append(entry)
+
+                result_full = [item for item in result_full if item]  # 移除空字典
+                result_full = sorted(result_full, key=lambda x: x["release"])  # 按放送日期排序
+
+                return result_full
+
         else:
-            print("Bangumi搜索失败，重试" + str(retry + 1))
             time.sleep(0.5)
-            retry += 1
-    print(f"在Bangumi中搜索{a_jp_name}失败")
+    print(f"2 ==> 搜索{jp_name}失败")
 
 
-# 向 Bangumi Subject 请求数据(/v0/subjects/subject_id)
-# https://bangumi.github.io/api/
-def bangumi_subject(b_id):
-    headers = {
-        'accept': 'application/json',
-        'User-Agent': 'nuthx/bangumi-renamer'
-    }
+# Bangumi 条目
+def bangumiSubject(bgm_id):
+    headers = {"accept": "application/json", "User-Agent": "nuthx/bangumi-renamer"}
+    url = "https://api.bgm.tv/v0/subjects/" + str(bgm_id)
+    print(f"3 ==> 搜索{bgm_id}")
 
-    url = "https://api.bgm.tv/v0/subjects/" + b_id
-    print(f"正在向Bangumi请求ID {b_id}的详细信息")
-
-    retry = 0
-    while retry < 3:
+    for retry in range(3):
         response = requests.get(url, headers=headers)
         if response.status_code == 200:
             result = json.loads(response.text)
-            print(f"成功获取到ID {b_id}的详细信息")
+            print(f"3 ==> 获取{bgm_id}数据")
 
-            b_type = result["platform"]
-            b_release_date = result["date"]
-            b_release_date = arrow.get(b_release_date).format("YYMMDD")  # 处理时间格式
-            b_episodes = result["eps"]
+            # 未搜索到内容停止
+            if "code" in result and result["code"] == 404:
+                return
 
-            # 格式化 b_type
-            b_type = b_type.lower()
-            if b_type in ["tv"]:
-                b_typecode = "01"
-            elif b_type in ["剧场版"]:
-                b_typecode = "02"
-            elif b_type in ["ova", "oad"]:
-                b_typecode = "03"
+            poster = result["images"]["medium"]
+            jp_name = result["name"]
+            cn_name = result["name_cn"]
+            types = result["platform"]
+            release = result["date"]
+            episodes = result["eps"]
+            score = result["rating"]["score"]
+
+            # 格式化 types
+            types = types.lower()
+            if types in ["tv"]:
+                typecode = "01"
+            elif types in ["剧场版"]:
+                typecode = "02"
+            elif types in ["ova", "oad"]:
+                typecode = "03"
             else:
-                b_typecode = "XBD"
-                print("不兼容的动画类型")
+                typecode = "XBD"
 
-            b_dict = dict()
-            b_dict["b_type"] = b_type
-            b_dict["b_typecode"] = b_typecode
-            b_dict["b_release_date"] = b_release_date
-            b_dict["b_episodes"] = b_episodes
-            return b_dict
+            # 评分保留一位小数
+            score = float(score)
+            score = format(score, ".1f")
+
+            return poster, jp_name, cn_name, types, typecode, release, episodes, score
         else:
-            print("Bangumi请求更多失败，重试" + str(retry + 1))
             time.sleep(0.5)
-            retry += 1
-    print(f"向Bangumi请求ID {b_id}的详细信息失败")
+    print(f"3 ==> 搜索{bgm_id}失败")
 
 
-# 向 Bangumi Previous 请求数据(v0/subjects/subjects)
-# https://bangumi.github.io/api/
-def bangumi_previous(b_id, b_cn_name):
-    headers = {
-        'accept': 'application/json',
-        'User-Agent': 'nuthx/bangumi-renamer'
-    }
+# Bangumi 前传
+def bangumiPrevious(init_id, init_name):
+    headers = {"accept": "application/json", "User-Agent": "nuthx/bangumi-renamer"}
+    url = "https://api.bgm.tv/v0/subjects/" + str(init_id) + "/subjects"
+    print(f"4 ==> 搜索{init_name}前传")
 
-    url = "https://api.bgm.tv/v0/subjects/" + b_id + "/subjects"
-    print(f"正在向Bangumi请求{b_cn_name}的上一季度数据")
-
-    retry = 0
-    while retry < 3:
+    for retry in range(3):
         response = requests.get(url, headers=headers)
         if response.status_code == 200:
             result = json.loads(response.text)
-            print(f"成功获取到{b_cn_name}的上一季数据")
+            print(f"4 ==> 获取{init_name}前传")
 
-            # 检测改动画 ID 是否有前传内容
-            # 如果有，返回前传 prev_id 和 prev_cn_name
-            # 如果没有，返回原始 b_id 和 b_cn_name
+            # 如果有前传，返回前传 prev_id 和 prev_name
+            # 如果没有前传，返回原始 init_id 和 not_now_bro
             for data in result:
-                if data["relation"] == "前传":
+                if data["relation"] in ["前传", "主线故事", "全集"]:
                     prev_id = str(data["id"])
-                    prev_cn_name = data["name_cn"]
-                    return prev_id, prev_cn_name
+                    prev_name = data["name_cn"]
+                    return prev_id, prev_name
             else:
-                return b_id, b_cn_name
+                return init_id, init_name
         else:
-            print("Bangumi请求上一季度信息失败，重试" + str(retry + 1))
             time.sleep(0.5)
-            retry += 1
-    print(f"在Bangumi中请求{b_cn_name}上一季度信息失败")
+    print(f"4 ==> 搜索{init_name}前传失败")
