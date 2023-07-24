@@ -39,7 +39,7 @@ jobs:
       with:
         name: BangumiRenamer_windows
         path: |
-          dist/*.exe
+          dist/*
           
     - name: Create Release and Upload Release Asset
       uses: release-drafter/release-drafter@v5
