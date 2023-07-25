@@ -1,4 +1,4 @@
-name: Build
+name: Build and Release
 
 on:
   push:
@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ windows-latest ]
+        os: [windows-latest, macos-latest, ubuntu-latest]
 
     steps:
       - name: Check out
@@ -32,15 +32,14 @@ jobs:
         run: pyinstaller build.spec
 
       - name: Upload (Windows)
-        if: ${{ runner.os == 'windows' }}
+        if: ${{ runner.os == 'windows-latest' }}
         uses: actions/upload-artifact@v3
         with:
           name: BangumiRenamer_windows
-          path: |
-            dist/*.exe
+          path: dist/*.exe
 
       - name: Upload (macOS)
-        if: ${{ runner.os == 'macos' }}
+        if: ${{ runner.os == 'macos-latest' }}
         uses: actions/upload-artifact@v3
         with:
           name: BangumiRenamer_mac_x86
@@ -48,7 +47,7 @@ jobs:
             dist/*.app
 
       - name: Upload (Linux)
-        if: ${{ runner.os == 'linux' }}
+        if: ${{ runner.os == 'ubuntu-latest' }}
         uses: actions/upload-artifact@v3
         with:
           name: BangumiRenamer_linux
@@ -60,27 +59,42 @@ jobs:
       - build
     runs-on: ubuntu-latest
     steps:
-      - name: Display structure of downloaded files
-        run: ls -R
-        
-      - name: Download
-        uses: actions/download-artifact@v2.1.1
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: |
-            BangumiRenamer.exe
-      
-      - name: Release
-        uses: ncipollo/release-action@v1
-        with:
-          tag: tag
-          name: 🎉
-          token: ${{ secrets.GITHUB_TOKEN }}
-          draft: true
-          files: |
-            *
+          tag_name: v1.0.0  # Replace this with the appropriate version number
+          release_name: Release v1.0.0  # Replace this with the appropriate release name
           body: |
-            ## 新增
-            - 新增内容0
+            Release Notes for v1.0.0  # Add your release notes here
+          draft: false
+          prerelease: false
 
-            ## 优化
-            - 优化内容
+      - name: Upload Windows Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/*.exe
+          asset_name: BangumiRenamer_windows.exe
+
+      - name: Upload macOS Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/*.app
+          asset_name: BangumiRenamer_mac_x86.app
+
+      - name: Upload Linux Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/*
+          asset_name: BangumiRenamer_linux
