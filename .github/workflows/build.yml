@@ -55,10 +55,14 @@ jobs:
             dist/*
 
   release:
-    needs:
-      - build
+    needs: build
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: BangumiRenamer_windows
+          path: dist0
+          
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
@@ -71,5 +75,3 @@ jobs:
           draft: true
           files: |
             BangumiRenamer_windows.exe
-            BangumiRenamer_mac_x86.app
-            BangumiRenamer_linux
