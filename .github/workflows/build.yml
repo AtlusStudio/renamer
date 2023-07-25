@@ -29,8 +29,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ on.push.tags }}
-        name: 🎉  ${{ on.push.tags }}
+        tag_name: on.push.tags
+        name: 🎉 on.push.tags
         draft: true
         body: |
           ## 新增
