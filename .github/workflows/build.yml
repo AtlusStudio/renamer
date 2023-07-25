@@ -65,7 +65,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         tag_name: ${{ steps.get_version.outputs.VERSION }}
-        name: 🎉 ${{ steps.get_version.outputs.VERSION }}
+        name: 🎉 ${{ steps.get_version.outputs.VERSION }} 80
         files: '*.zip'
         draft: true
         body: |
