@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
+        os: [ windows-latest, macos-latest, ubuntu-latest ]
 
     steps:
       - name: Check out
@@ -32,27 +32,25 @@ jobs:
         run: pyinstaller build.spec
 
       - name: Upload (Windows)
-        if: ${{ runner.os == 'windows-latest' }}
+        if: ${{ runner.os == 'windows' }}
         uses: actions/upload-artifact@v3
         with:
           name: BangumiRenamer_windows
           path: dist/*.exe
 
       - name: Upload (macOS)
-        if: ${{ runner.os == 'macos-latest' }}
+        if: ${{ runner.os == 'macos' }}
         uses: actions/upload-artifact@v3
         with:
           name: BangumiRenamer_mac_x86
-          path: |
-            dist/*.app
+          path: dist/*.app
 
       - name: Upload (Linux)
-        if: ${{ runner.os == 'ubuntu-latest' }}
+        if: ${{ runner.os == 'linux' }}
         uses: actions/upload-artifact@v3
         with:
           name: BangumiRenamer_linux
-          path: |
-            dist/*
+          path: dist/*
 
   release:
     needs: build
