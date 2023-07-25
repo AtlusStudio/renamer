@@ -68,8 +68,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: v1.0
-          release_name: lol
+          name: lol
           body: lot
           draft: true
-          files: |
-            dist0/BangumiRenamer_windows
+          files: /home/runner/work/renamer/renamer/dist0/*
