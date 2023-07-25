@@ -72,4 +72,4 @@ jobs:
           body: lot
           draft: true
           files: |
-            BangumiRenamer_windows.exe
+            dist0/BangumiRenamer_windows
