@@ -17,18 +17,15 @@ jobs:
     - name: Check out
       uses: actions/checkout@v3
 
-    - name: Upload (Windows)
-      uses: actions/upload-artifact@v3
-      with:
-        name: BangumiRenamer_windows
-        path: |
-          dist
+    - name: Get version
+      id: get_version
+      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
           
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: on.push.tags
-        name: 🎉 on.push.tags
+        tag_name: ${{ steps.get_version.outputs.VERSION }}
+        name: 🎉 ${{ steps.get_version.outputs.VERSION }}
         draft: true
         body: |
           ## 新增
