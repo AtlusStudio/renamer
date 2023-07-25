@@ -27,7 +27,7 @@ jobs:
       with:
         name: BangumiRenamer_windows
         path: |
-          image
+          dist
           
     - name: Release
       uses: release-drafter/release-drafter@v5
