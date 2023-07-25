@@ -29,8 +29,8 @@ jobs:
         path: |
           dist
 
-    - name: Show GitHub Ref Value
-      run: echo "GitHub Ref: ${{ github.ref }}"
+    - name: Show
+      run: echo ${{ github.ref }}
           
     - name: Release
       uses: softprops/action-gh-release@v1
