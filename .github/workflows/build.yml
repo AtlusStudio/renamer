@@ -64,7 +64,7 @@ jobs:
         uses: actions/download-artifact@v2.1.1
         with:
           name: |
-            BangumiRenamer_windows.zip
+            BangumiRenamer.exe
       
       - name: Release
         uses: ncipollo/release-action@v1
