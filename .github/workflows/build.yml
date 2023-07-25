@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ windows-latest, macos-latest, ubuntu-latest ]
+        os: [ windows-latest ]
 
     steps:
       - name: Check out
@@ -63,10 +63,7 @@ jobs:
       - name: Download
         uses: actions/download-artifact@v2.1.1
         with:
-          name: |
-            BangumiRenamer_linux
-            BangumiRenamer_mac_x86
-            BangumiRenamer_windows
+          name: '*'
       
       - name: Release
         uses: ncipollo/release-action@v1
