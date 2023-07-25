@@ -65,10 +65,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v1.0.0  # Replace this with the appropriate version number
-          release_name: Release v1.0.0  # Replace this with the appropriate release name
+          tag_name: v1.0.0  # 替换为合适的版本号
+          release_name: Release v1.0.0  # 替换为合适的发布名称
           body: |
-            Release Notes for v1.0.0  # Add your release notes here
+            Release Notes for v1.0.0  # 在这里添加发布说明
           draft: false
           prerelease: false
 
@@ -80,6 +80,7 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: dist/*.exe
           asset_name: BangumiRenamer_windows.exe
+          asset_content_type: application/x-msdownload  # Windows 的文件类型
 
       - name: Upload macOS Release Asset
         uses: actions/upload-release-asset@v1
@@ -89,6 +90,7 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: dist/*.app
           asset_name: BangumiRenamer_mac_x86.app
+          asset_content_type: application/octet-stream  # macOS 的文件类型
 
       - name: Upload Linux Release Asset
         uses: actions/upload-release-asset@v1
@@ -98,3 +100,4 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: dist/*
           asset_name: BangumiRenamer_linux
+          asset_content_type: application/x-tar  # Linux 的文件类型
