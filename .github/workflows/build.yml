@@ -30,8 +30,7 @@ jobs:
           dist
 
     - name: Show GitHub Ref Value
-        run: |
-          echo "GitHub Ref: ${{ github.ref }}"
+      run: echo "GitHub Ref: ${{ github.ref }}"
           
     - name: Release
       uses: softprops/action-gh-release@v1
