@@ -36,4 +36,3 @@ jobs:
       with:
         template: |
           ## Changes
-          $CHANGES
