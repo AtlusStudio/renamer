@@ -77,19 +77,9 @@ jobs:
       - name: Create release assets
         id: vars
         run: |
-          REAL_ESRGAN_PLATFORM=
-
           mkdir release
 
           for BUILD_OS in "Windows" "Linux" "macOS"; do
-            if [ $BUILD_OS == "Windows" ]; then
-              REAL_ESRGAN_PLATFORM=windows
-            elif [ $BUILD_OS == "Linux" ]; then
-              REAL_ESRGAN_PLATFORM=ubuntu
-            elif [ $BUILD_OS == "macOS" ]; then
-              REAL_ESRGAN_PLATFORM=macos
-            fi
-
             if [ $BUILD_OS == "Windows" ]; then
               7z a \
                 ../release/BangumiRenamer_Windows.7z \
@@ -97,7 +87,6 @@ jobs:
                 -mx9 -mfb256 -md1g -ms
                 
             elif [ $BUILD_OS == "Linux" ]; then
-              chmod +x BangumiRenamer
               XZ_OPT=-e9 tar Jcvf \
                 ../release/BangumiRenamer_Linux.tar.xz \
                 /home/runner/work/renamer/renamer/dist/BangumiRenamer
