@@ -33,8 +33,9 @@ jobs:
       
       - name: ZIP (Windows)
         if: ${{ runner.os == 'windows' }}
-        run: |
-          zip -r BangumiRenamer_windows.zip dist/*.exe
+        uses: montudor/action-zip@v1
+        with:
+          args: zip -qq -r BangumiRenamer_windows.zip dist/*.exe
 
       - name: Upload (Windows)
         if: ${{ runner.os == 'windows' }}
@@ -45,8 +46,9 @@ jobs:
       
       - name: ZIP (macOS)
         if: ${{ runner.os == 'macos' }}
-        run: |
-          zip -r BangumiRenamer_mac_x86.zip dist/*.app
+        uses: montudor/action-zip@v1
+        with:
+          args: zip -qq -r BangumiRenamer_mac_x86.zip dist/*.app
 
       - name: Upload (macOS)
         if: ${{ runner.os == 'macos' }}
@@ -57,8 +59,9 @@ jobs:
       
       - name: ZIP (Linux)
         if: ${{ runner.os == 'linux' }}
-        run: |
-          zip -r BangumiRenamer_linux.zip dist/*
+        uses: montudor/action-zip@v1
+        with:
+          args: zip -qq -r BangumiRenamer_linux.zip dist/*
 
       - name: Upload (Linux)
         if: ${{ runner.os == 'linux' }}
