@@ -62,17 +62,17 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: BangumiRenamer-Windows
-          path: dist-Windows
+          path: dist
           
       - uses: actions/download-artifact@v3
         with:
           name: BangumiRenamer-Linux
-          path: dist-Linux
+          path: dist
           
       - uses: actions/download-artifact@v3
         with:
           name: BangumiRenamer-macOS
-          path: dist-macOS
+          path: dist
           
       - name: Create release assets
         id: vars
@@ -93,20 +93,19 @@ jobs:
             if [ $BUILD_OS == "Windows" ]; then
               7z a \
                 ../release/BangumiRenamer_Windows.7z \
-                BangumiRenamer.exe \
+                /home/runner/work/renamer/renamer/dist/BangumiRenamer.exe \
                 -mx9 -mfb256 -md1g -ms
                 
             elif [ $BUILD_OS == "Linux" ]; then
               chmod +x BangumiRenamer
               XZ_OPT=-e9 tar Jcvf \
                 ../release/BangumiRenamer_Linux.tar.xz \
-                ./BangumiRenamer
+                /home/runner/work/renamer/renamer/dist/BangumiRenamer
                 
             elif [ $BUILD_OS == "macOS" ]; then
-              cd ../../../
               XZ_OPT=-e9 tar Jcvf \
                 ../release/BangumiRenamer_macOS_x86.tar.xz \
-                BangumiRenamer.app
+                /home/runner/work/renamer/renamer/dist/BangumiRenamer.app
             fi
 
             cd ..
