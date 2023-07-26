@@ -62,15 +62,15 @@ jobs:
       
       - name: Move files
         run: |
-          cp BangumiRenamer_mac_x86/BangumiRenamer.app .
+          cp -r BangumiRenamer_mac_x86/BangumiRenamer.app .
           cp BangumiRenamer_windows/BangumiRenamer.exe .
           cp BangumiRenamer_linux/BangumiRenamer .
         
       - name: ZIP
         run: |
           zip -r BangumiRenamer_mac_x86.zip BangumiRenamer.app
-          zip -r BangumiRenamer_windows.zip BangumiRenamer.exe
-          zip -r BangumiRenamer_linux.zip BangumiRenamer
+          zip BangumiRenamer_windows.zip BangumiRenamer.exe
+          zip BangumiRenamer_linux.zip BangumiRenamer
 
       - name: Release
         uses: softprops/action-gh-release@v1
