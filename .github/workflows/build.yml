@@ -51,7 +51,7 @@ jobs:
       - name: Upload result
         uses: actions/upload-artifact@v3
         with:
-          name: realesrgan-gui-${{ runner.os }}
+          name: BangumiRenamer-${{ runner.os }}
           path: dist
           
   release:
@@ -61,27 +61,23 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
-          name: realesrgan-gui-Windows
+          name: BangumiRenamer-Windows
           path: dist-Windows
+          
       - uses: actions/download-artifact@v3
         with:
-          name: realesrgan-gui-Linux
+          name: BangumiRenamer-Linux
           path: dist-Linux
+          
       - uses: actions/download-artifact@v3
         with:
-          name: realesrgan-gui-macOS
+          name: BangumiRenamer-macOS
           path: dist-macOS
+          
       - name: Create release assets
         id: vars
         run: |
-          # https://github.com/xinntao/Real-ESRGAN/releases
-          REAL_ESRGAN_VERSION=v0.2.5.0
-          REAL_ESRGAN_RELEASE_TIME=20220424
           REAL_ESRGAN_PLATFORM=
-
-          BUILD_TIME=$(date +%Y%m%d-%H%I%S)
-          echo "release_name=Automated build ${BUILD_TIME}" >> $GITHUB_OUTPUT
-          echo "tag_name=autobuild-${BUILD_TIME}" >> $GITHUB_OUTPUT
 
           mkdir release
 
@@ -93,43 +89,24 @@ jobs:
             elif [ $BUILD_OS == "macOS" ]; then
               REAL_ESRGAN_PLATFORM=macos
             fi
-            if [ $BUILD_OS == "macOS" ]; then
-              cd "dist-${BUILD_OS}/Real-ESRGAN GUI.app/Contents/MacOS"
-            else
-              cd "dist-${BUILD_OS}"
-            fi
-            wget \
-              -nv \
-              -O realesrgan-ncnn-vulkan.zip \
-              "https://github.com/xinntao/Real-ESRGAN/releases/download/${REAL_ESRGAN_VERSION}/realesrgan-ncnn-vulkan-${REAL_ESRGAN_RELEASE_TIME}-${REAL_ESRGAN_PLATFORM}.zip"
-            unzip realesrgan-ncnn-vulkan.zip
-            rm -f realesrgan-ncnn-vulkan.zip input.jpg input2.jpg onepiece_demo.mp4
 
             if [ $BUILD_OS == "Windows" ]; then
               7z a \
-                ../release/realesrgan-gui-${REAL_ESRGAN_PLATFORM}.7z \
-                realesrgan-gui.exe \
+                ../release/BangumiRenamer_Windows.7z \
+                BangumiRenamer.exe \
                 -mx9 -mfb256 -md1g -ms
-              7z a \
-                ../release/realesrgan-gui-${REAL_ESRGAN_PLATFORM}-bundled-${REAL_ESRGAN_VERSION}.7z \
-                . \
-                -mx9 -mfb256 -md1g -ms
+                
             elif [ $BUILD_OS == "Linux" ]; then
-              chmod +x realesrgan-gui realesrgan-ncnn-vulkan
+              chmod +x BangumiRenamer
               XZ_OPT=-e9 tar Jcvf \
-                ../release/realesrgan-gui-${REAL_ESRGAN_PLATFORM}.tar.xz \
-                --transform "s,^\.,realesrgan-gui," \
-                ./realesrgan-gui
-              XZ_OPT=-e9 tar Jcvf \
-                ../release/realesrgan-gui-${REAL_ESRGAN_PLATFORM}-bundled-${REAL_ESRGAN_VERSION}.tar.xz \
-                --transform "s,^\.,realesrgan-gui," \
-                .
+                ../release/BangumiRenamer_Linux.tar.xz \
+                ./BangumiRenamer
+                
             elif [ $BUILD_OS == "macOS" ]; then
-              chmod +x realesrgan-gui realesrgan-ncnn-vulkan
               cd ../../../
               XZ_OPT=-e9 tar Jcvf \
-                ../release/realesrgan-gui-${REAL_ESRGAN_PLATFORM}-appbundle-${REAL_ESRGAN_VERSION}.tar.xz \
-                "Real-ESRGAN GUI.app"
+                ../release/BangumiRenamer_macOS_x86.tar.xz \
+                BangumiRenamer.app
             fi
 
             cd ..
@@ -138,12 +115,12 @@ jobs:
           echo "release_files<<EOF" >> $GITHUB_OUTPUT
           find release -type f >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Release automated build
         uses: softprops/action-gh-release@v1
-        if: ${{ github.event.inputs.release }}
         with:
-          name: ${{ steps.vars.outputs.release_name }}
-          tag_name: ${{ steps.vars.outputs.tag_name }}
+          name: 1
+          tag_name: 2
           files: ${{ steps.vars.outputs.release_files }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
