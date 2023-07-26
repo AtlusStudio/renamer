@@ -65,8 +65,9 @@ jobs:
         
       - name: ZIP
         run: |
+          cp dist/BangumiRenamer_windows/BangumiRenamer.app .
+          zip -r BangumiRenamer_mac_x86.zip BangumiRenamer.app
           zip BangumiRenamer_windows.zip dist/BangumiRenamer_windows/BangumiRenamer.exe
-          zip BangumiRenamer_mac_x86.zip dist/BangumiRenamer_mac_x86/BangumiRenamer.app
           zip BangumiRenamer_linux.zip dist/BangumiRenamer_linux/BangumiRenamer
 
       - name: Release
