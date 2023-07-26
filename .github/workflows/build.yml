@@ -81,19 +81,19 @@ jobs:
 
           for BUILD_OS in "Windows" "Linux" "macOS"; do
             if [ $BUILD_OS == "Windows" ]; then
-              7z a \
-                ../release/BangumiRenamer_Windows.7z \
+              zip -9 -r \
+                ../release/BangumiRenamer_Windows.zip \
                 /home/runner/work/renamer/renamer/dist/BangumiRenamer.exe \
                 -mx9 -mfb256 -md1g -ms
                 
             elif [ $BUILD_OS == "Linux" ]; then
-              XZ_OPT=-e9 tar Jcvf \
-                /home/runner/work/renamer/renamer/release/BangumiRenamer_Linux.tar.xz \
+              zip -9 -r \
+                ../release/BangumiRenamer_Linux.zip \
                 /home/runner/work/renamer/renamer/dist/BangumiRenamer
                 
             elif [ $BUILD_OS == "macOS" ]; then
-              XZ_OPT=-e9 tar Jcvf \
-                /home/runner/work/renamer/renamer/release/BangumiRenamer_macOS_x86.tar.xz \
+              zip -9 -r \
+                ../release/BangumiRenamer_macOS_x86.zip \
                 /home/runner/work/renamer/renamer/dist/BangumiRenamer.app
             fi
 
