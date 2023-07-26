@@ -56,19 +56,21 @@ jobs:
     steps:
       - name: Download
         uses: actions/download-artifact@v3
-        with:
-          path: dist
 
       - name: Display files
         run: ls -R
-        working-directory: dist
+      
+      - name: Move files
+        run: |
+          cp BangumiRenamer_mac_x86/BangumiRenamer.app .
+          cp BangumiRenamer_windows/BangumiRenamer.exe .
+          cp BangumiRenamer_linux/BangumiRenamer .
         
       - name: ZIP
         run: |
-          cp dist/BangumiRenamer_windows/BangumiRenamer.app .
           zip -r BangumiRenamer_mac_x86.zip BangumiRenamer.app
-          zip BangumiRenamer_windows.zip dist/BangumiRenamer_windows/BangumiRenamer.exe
-          zip BangumiRenamer_linux.zip dist/BangumiRenamer_linux/BangumiRenamer
+          zip -r BangumiRenamer_windows.zip BangumiRenamer.exe
+          zip -r BangumiRenamer_linux.zip BangumiRenamer
 
       - name: Release
         uses: softprops/action-gh-release@v1
