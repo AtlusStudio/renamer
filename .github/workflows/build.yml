@@ -88,12 +88,12 @@ jobs:
                 
             elif [ $BUILD_OS == "Linux" ]; then
               XZ_OPT=-e9 tar Jcvf \
-                ../release/BangumiRenamer_Linux.tar.xz \
+                /home/runner/work/renamer/renamer/release/BangumiRenamer_Linux.tar.xz \
                 /home/runner/work/renamer/renamer/dist/BangumiRenamer
                 
             elif [ $BUILD_OS == "macOS" ]; then
               XZ_OPT=-e9 tar Jcvf \
-                ../release/BangumiRenamer_macOS_x86.tar.xz \
+                /home/runner/work/renamer/renamer/release/BangumiRenamer_macOS_x86.tar.xz \
                 /home/runner/work/renamer/renamer/dist/BangumiRenamer.app
             fi
 
