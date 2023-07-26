@@ -76,7 +76,10 @@ jobs:
         with:
           tag_name: tag
           draft: true
-          files: /home/runner/work/renamer/renamer/dist/*
+          files: |
+            BangumiRenamer_windows.zip
+            BangumiRenamer_mac_x86.zip
+            BangumiRenamer_linux.zip
           name: 🎉
           body: |
             ## 新增
