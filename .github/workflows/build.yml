@@ -57,8 +57,11 @@ jobs:
       - name: Download
         uses: actions/download-artifact@v3
         with:
-          name: '*'
           path: dist
+
+      - name: Display structure of downloaded files
+        run: ls -R
+        working-directory: dist
 
       - name: Release
         uses: softprops/action-gh-release@v1
