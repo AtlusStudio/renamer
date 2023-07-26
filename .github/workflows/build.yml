@@ -29,47 +29,33 @@ jobs:
       - name: Build
         run: pyinstaller build.spec
 
-      - name: ZIP (Windows)
-        if: ${{ runner.os == 'windows' }}
-        run: |
-          zip -r BangumiRenamer_windows.zip dist/*.exe
-
       - name: Upload (Windows)
         if: ${{ runner.os == 'windows' }}
         uses: actions/upload-artifact@v3
         with:
           name: BangumiRenamer_windows
-          path: BangumiRenamer_windows.zip
-
-      - name: ZIP (macOS)
-        if: ${{ runner.os == 'macos' }}
-        run: |
-          zip -r BangumiRenamer_mac_x86.zip dist/*.app
+          path: dist/*.exe
 
       - name: Upload (macOS)
         if: ${{ runner.os == 'macos' }}
         uses: actions/upload-artifact@v3
         with:
           name: BangumiRenamer_mac_x86
-          path: BangumiRenamer_mac_x86.zip
-
-      - name: ZIP (Linux)
-        if: ${{ runner.os == 'linux' }}
-        run: |
-          zip -r BangumiRenamer_linux.zip dist/*
+          path: dist/*.app
           
       - name: Upload (Linux)
         if: ${{ runner.os == 'linux' }}
         uses: actions/upload-artifact@v3
         with:
           name: BangumiRenamer_linux
-          path: BangumiRenamer_linux.zip
+          path: dist/*
 
   release:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v3
+      - name: Download
+        uses: actions/download-artifact@v3
         with:
           name: |
             BangumiRenamer_windows
@@ -77,8 +63,7 @@ jobs:
             BangumiRenamer_linux
           path: dist
 
-      - name: Create Release
-        id: create_release
+      - name: Release
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
