@@ -57,8 +57,7 @@ jobs:
       - name: Download
         uses: actions/download-artifact@v3
         with:
-          name: |
-            BangumiRenamer_windows
+          name: '*'
           path: dist
 
       - name: Release
