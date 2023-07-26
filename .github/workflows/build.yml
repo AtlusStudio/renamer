@@ -59,9 +59,15 @@ jobs:
         with:
           path: dist
 
-      - name: Display structure of downloaded files
+      - name: Display files
         run: ls -R
         working-directory: dist
+        
+      - name: ZIP
+        run: |
+          zip -r BangumiRenamer_windows.zip dist/BangumiRenamer_windows/BangumiRenamer.exe
+          zip -r BangumiRenamer_mac_x86.zip dist/BangumiRenamer_mac_x86/BangumiRenamer.app
+          zip -r BangumiRenamer_linux.zip dist/BangumiRenamer_linux/BangumiRenamer
 
       - name: Release
         uses: softprops/action-gh-release@v1
