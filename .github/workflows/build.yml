@@ -30,27 +30,42 @@ jobs:
 
       - name: Build
         run: pyinstaller build.spec
+      
+      - name: ZIP (Windows)
+        if: ${{ runner.os == 'windows' }}
+        run: |
+          zip -r BangumiRenamer_windows.zip dist/*.exe
 
       - name: Upload (Windows)
         if: ${{ runner.os == 'windows' }}
         uses: actions/upload-artifact@v3
         with:
           name: BangumiRenamer_windows
-          path: dist/*.exe
+          path: BangumiRenamer_windows.zip
+      
+      - name: ZIP (macOS)
+        if: ${{ runner.os == 'macos' }}
+        run: |
+          zip -r BangumiRenamer_mac_x86.zip dist/*.app
 
       - name: Upload (macOS)
         if: ${{ runner.os == 'macos' }}
         uses: actions/upload-artifact@v3
         with:
           name: BangumiRenamer_mac_x86
-          path: dist/*.app
+          path: BangumiRenamer_mac_x86.zip
+      
+      - name: ZIP (Linux)
+        if: ${{ runner.os == 'linux' }}
+        run: |
+          zip -r BangumiRenamer_linux.zip dist/*
 
       - name: Upload (Linux)
         if: ${{ runner.os == 'linux' }}
         uses: actions/upload-artifact@v3
         with:
           name: BangumiRenamer_linux
-          path: dist/*
+          path: BangumiRenamer_linux.zip
 
   release:
     needs: build
@@ -58,8 +73,11 @@ jobs:
     steps:
       - uses: actions/download-artifact@v3
         with:
-          name: BangumiRenamer_windows
-          path: dist0
+          name: |
+            BangumiRenamer_windows
+            BangumiRenamer_mac_x86
+            BangumiRenamer_linux
+          path: dist
           
       - name: Create Release
         id: create_release
@@ -67,8 +85,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v1.0
-          name: lol
-          body: lot
+          tag_name: tag
           draft: true
-          files: /home/runner/work/renamer/renamer/dist0/*
+          files: /home/runner/work/renamer/renamer/dist/*
+          name: 🎉
+          body: |
+            ## 新增
+            - 新增内容
+            
+            ## 优化
+            - 优化内容
